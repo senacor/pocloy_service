@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.senacor.bankathon2018.service.model.LoyaltyCode;
-
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class LoyaltyCodeDTO {
 
@@ -30,7 +28,8 @@ public class LoyaltyCodeDTO {
     this.codeId = loyaltyCode.getPaymentTransactionId();
   }
 
-  public LoyaltyCodeDTO(String loyaltyCode, String status, String content, Date paymentDate,
+  public LoyaltyCodeDTO(String loyaltyCode, String status, String content,
+      LocalDateTime paymentDate,
       String codeId) {
     this.loyaltyCode = loyaltyCode;
     this.status = status;

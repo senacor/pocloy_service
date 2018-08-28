@@ -1,7 +1,6 @@
 package com.senacor.bankathon2018.service.model;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -25,7 +24,7 @@ public class LoyaltyCode {
   }
 
   public LoyaltyCode(String loyaltyCode, LoyaltyStatus status,
-                     LoyaltyContent content, LocalDateTime paymentDate, String paymentTransactionId, String user) {
+      LoyaltyContent content, LocalDateTime paymentDate, String paymentTransactionId, String user) {
     this.loyaltyCode = loyaltyCode;
     this.status = status;
     this.content = content;
