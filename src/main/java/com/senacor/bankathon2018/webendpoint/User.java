@@ -5,12 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senacor.bankathon2018.service.LoginService;
 import com.senacor.bankathon2018.service.TransactionService;
 import com.senacor.bankathon2018.webendpoint.model.Credentials;
-import com.senacor.bankathon2018.webendpoint.model.LoyaltyCode;
+import com.senacor.bankathon2018.webendpoint.model.dto.LoyaltyCodeDTO;
 import io.vavr.control.Try;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,15 +37,15 @@ public class User {
                 ResponseEntity.badRequest().build();
     }
 
-  @GetMapping("/transactions")
+  @PostMapping("/transactions")
   public ResponseEntity<String> transactions(@RequestBody Credentials credentials)
       throws JsonProcessingException {
-    Try<List<LoyaltyCode>> codes = transactionService.getLoyaltyCodes(credentials);
+    Try<List<LoyaltyCodeDTO>> codes = transactionService.getLoyaltyCodes(credentials);
     ObjectMapper objectMapper = new ObjectMapper();
     String codesAsJson;
 
     if (codes.isSuccess()) {
-      codesAsJson = objectMapper.writeValueAsString(codes);
+      codesAsJson = objectMapper.writeValueAsString(codes.get());
       return ResponseEntity.ok(codesAsJson);
     } else {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
