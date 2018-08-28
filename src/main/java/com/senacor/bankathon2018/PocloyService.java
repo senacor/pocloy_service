@@ -1,7 +1,10 @@
 package com.senacor.bankathon2018;
 
+import com.senacor.bankathon2018.connectors.model.UserId;
 import com.senacor.bankathon2018.service.AxwayService;
+import com.senacor.bankathon2018.service.NotificationService;
 import com.senacor.bankathon2018.service.repository.AxwaySessionRepository;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
 import io.vavr.control.Try;
 import me.figo.FigoConnection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,9 +27,7 @@ public class PocloyService implements CommandLineRunner {
     private String figoClientSecret;
 
     @Autowired
-    private AxwayService axwayService;
-    @Autowired
-    private AxwaySessionRepository repo;
+    private NotificationService notificationService;
 
     public static void main(String[] args) {
         SpringApplication.run(PocloyService.class, args);
@@ -43,16 +45,13 @@ public class PocloyService implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Try<String> createUser = axwayService.getSessionForTechnicalUser()
-                .map(session -> axwayService.createUser("deleteMe", "NotVerySecure", session));
-        createUser.onSuccess(session -> System.out.println("Session=" + session));
-        createUser.onFailure(throwable -> {
-            if (throwable instanceof HttpClientErrorException) {
-                HttpClientErrorException httpClientErrorException = (HttpClientErrorException) throwable;
-                System.out.println(httpClientErrorException.getResponseBodyAsString());
-            } else {
-                System.out.println(throwable.getLocalizedMessage());
-            }
+        /*Credentials credentials = new Credentials("blalasaadri@googlemail.com", "Geheim");
+        Try<ResponseEntity<UserId>> test = notificationService.test(credentials);
+        test.onFailure(throwable -> {
+            System.out.println(throwable);
         });
+        test.onSuccess(succ -> {
+            System.out.println(succ);
+        });*/
     }
 }

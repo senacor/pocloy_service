@@ -156,7 +156,7 @@ public class TransactionService {
             break;
           }
           if (!stickerFound) {
-            throw new IllegalArgumentException("User has not enough stickers");
+            throw new IllegalArgumentException("UserId has not enough stickers");
           }
         }
       }

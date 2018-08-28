@@ -38,30 +38,65 @@ public class AxwayService {
         this.sessionRepository = sessionRepository;
     }
 
-    public String loginAndObtainSession(Credentials credentials) {
+    public Try<String> loginAndObtainSession(Credentials credentials) {
+        String login = credentials.getUsername();
+        String password = credentials.getPassword();
 
-        figoConnector.figoLogin(credentials)
+        return figoConnector.figoLogin(credentials)
                 .map(token -> this.getSessionForTechnicalUser())
                 .map(Try::get)
-                .mapTry(session -> doesUserExit(credentials.getUsername(), session));
-
-        return null;
+                .mapTry(session -> doesUserExit(login, session))
+                .mapTry(doesExit -> {
+                    if (doesExit) {
+                        return getSession(login, password)
+                                .getOrElseThrow(throwable -> {
+                                    LOG.error("Error while trying to obtain a session. User did exit before.", throwable);
+                                    throw new RuntimeException(throwable.getMessage(), throwable);
+                                });
+                    } else if (createUser(login, password)) {
+                        return getSession(login, password)
+                                .getOrElseThrow(throwable -> {
+                                    LOG.error("Error while trying to obtain a session. User did not exit before.", throwable);
+                                    throw new RuntimeException(throwable.getMessage(), throwable);
+                                });
+                    } else {
+                        throw new RuntimeException("Could not create new User");
+                    }
+                });
     }
+
 
     private boolean doesUserExit(String username, String session) throws JsonProcessingException {
         ResponseEntity<AxwayUserQueryResponse> res = axwayConnector.userQuery(new AxwayUserQuery(username), session);
-        return res.getBody().getResponse().getUsers().size() > 0;
+        long count = res.getBody().getResponse().getUsers()
+                .stream()
+                .filter(user -> username.equals(user.getUsername()))
+                .count();
+        return count > 0;
+    }
+
+
+    private boolean createUser(String login, String password) {
+        return getSessionForTechnicalUser()
+                .map(session -> createUser(login, password, session))
+                .getOrElseThrow(throwable -> {
+                    throw new RuntimeException(throwable);
+                });
     }
 
     private boolean createUser(String login, String password, String techUsrSession) {
         return axwayConnector.createUser(login, password, techUsrSession).isSuccess();
     }
-    
 
-    public Try<String> getSessionForTechnicalUser() {
+
+    private Try<String> getSessionForTechnicalUser() {
         LOG.info("Obtaining a Session for technical axway usr...");
+        return getSession(axwayTechUsrLogin, axwayTechUsrPwd);
+    }
+
+    private Try<String> getSession(String login, String password) {
         return Try.of(() ->
-                sessionRepository.findById(axwayTechUsrLogin)
+                sessionRepository.findById(login)
                         .filter(axwaySession -> {
                             boolean isOlderThan3Months = axwaySession.getDateTime().isBefore(LocalDateTime.now().minusMonths(3));
                             if (isOlderThan3Months)
@@ -69,7 +104,7 @@ public class AxwayService {
                             return !isOlderThan3Months;
                         })
                         .map(AxwaySession::getCookie)
-                        .orElseGet(() -> getAndSaveSession(axwayTechUsrLogin, axwayTechUsrPwd).get())
+                        .orElseGet(() -> getAndSaveSession(login, password).get())
         );
     }
 
