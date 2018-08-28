@@ -12,28 +12,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoginService {
 
-    private final static Logger LOG = LoggerFactory.getLogger(LoginService.class);
-    private final FigoConnector figoConnector;
+  private final static Logger LOG = LoggerFactory.getLogger(LoginService.class);
+  private final FigoConnector figoConnector;
 
-    public LoginService(FigoConnector figoConnector) {
-        this.figoConnector = figoConnector;
-    }
+  public LoginService(FigoConnector figoConnector) {
+    this.figoConnector = figoConnector;
+  }
 
-    public boolean isLoginViable(Credentials credentials) {
-        //TODO More Error Handling?
-        Try<TokenResponse> tokenResponses = figoConnector.figoLogin(credentials);
-        if(tokenResponses.isSuccess()) {
-            LOG.info("Login was successful");
-            return true;
-        } else {
-            LOG.debug("Login was unsuccessful: ", tokenResponses.getCause());
-            return false;
-        }
+  public boolean isLoginViable(Credentials credentials) {
+    //TODO More Error Handling?
+    Try<TokenResponse> tokenResponses = figoConnector.figoLogin(credentials);
+    if (tokenResponses.isSuccess()) {
+      LOG.info("Login was successful");
+      return true;
+    } else {
+      LOG.debug("Login was unsuccessful: ", tokenResponses.getCause());
+      return false;
     }
+  }
 
-    public Try<String> obtainAccessToken(Credentials credentials) {
-        Try<TokenResponse> tokenResponses = figoConnector.figoLogin(credentials);
-        return tokenResponses.map(res -> res.access_token);
-    }
+  public Try<String> obtainAccessToken(Credentials credentials) {
+    Try<TokenResponse> tokenResponses = figoConnector.figoLogin(credentials);
+    return tokenResponses.map(res -> res.access_token);
+  }
 
 }
