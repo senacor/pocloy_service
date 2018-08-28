@@ -83,8 +83,8 @@ public class TransactionService {
         .findById(loyaltyCodeWithCredentials.getCodeId()).get();
 
     //TODO: Maybe make select content after pattern
-    int pick = 1 + new Random(Calendar.getInstance().getTimeInMillis())
-        .nextInt(LoyaltyContent.values().length);
+    int pick = 1 +  new Random(Calendar.getInstance().getTimeInMillis())
+        .nextInt(LoyaltyContent.values().length - 1);
     LoyaltyContent surpriseContent = LoyaltyContent.values()[pick];
 
     loyaltyCodeToUnpack.setContent(surpriseContent);
