@@ -41,13 +41,13 @@ public class FigoConnector {
 
     public TransactionsEntity getTransactions(String accessToken, String lastTransactionID,
         boolean includePending) {
-        System.out.println("accessToken=" + accessToken);
+        LOG.info("accessToken=" + accessToken);
         UriComponents builder = UriComponentsBuilder.fromHttpUrl(figoBaseUrl + "/rest/transactions")
                 .queryParam("since", lastTransactionID)
                 .queryParam("include_pending", includePending)
                 .build();
 
-        System.out.println("URL=" + builder.toString());
+        LOG.info("URL=" + builder.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + accessToken);
