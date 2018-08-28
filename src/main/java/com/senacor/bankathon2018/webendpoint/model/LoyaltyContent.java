@@ -1,4 +1,4 @@
-package com.senacor.bankathon2018.dto;
+package com.senacor.bankathon2018.webendpoint.model;
 
 public enum LoyaltyContent {
 

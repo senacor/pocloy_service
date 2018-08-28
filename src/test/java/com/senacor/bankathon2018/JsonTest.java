@@ -2,9 +2,9 @@ package com.senacor.bankathon2018;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.senacor.bankathon2018.dto.LoyaltyCode;
-import com.senacor.bankathon2018.dto.LoyaltyContent;
-import com.senacor.bankathon2018.dto.LoyaltyStatus;
+import com.senacor.bankathon2018.webendpoint.model.LoyaltyCode;
+import com.senacor.bankathon2018.webendpoint.model.LoyaltyContent;
+import com.senacor.bankathon2018.webendpoint.model.LoyaltyStatus;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
