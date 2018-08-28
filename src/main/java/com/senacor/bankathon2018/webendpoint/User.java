@@ -6,6 +6,7 @@ import com.senacor.bankathon2018.service.LoginService;
 import com.senacor.bankathon2018.service.TransactionService;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.LoyaltyCodeWithCredentials;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
 import io.vavr.control.Try;
 import java.util.List;
@@ -76,5 +77,11 @@ public class User {
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @PostMapping("/redeemVoucher")
+    public ResponseEntity<String> redeemVoucher(
+        @RequestBody VoucherWithCredentials voucherWithCredentials) {
+        return null;
     }
 }
