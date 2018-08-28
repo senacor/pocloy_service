@@ -1,23 +1,21 @@
 package com.senacor.bankathon2018.webendpoint;
 
-import com.senacor.bankathon2018.connectors.FigoConnector;
-import com.senacor.bankathon2018.service.LoginService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senacor.bankathon2018.dto.LoyaltyCode;
 import com.senacor.bankathon2018.dto.LoyaltyContent;
 import com.senacor.bankathon2018.dto.LoyaltyStatus;
+import com.senacor.bankathon2018.service.LoginService;
 import com.senacor.bankathon2018.webendpoint.model.Credentials;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
 
 @RestController()
 @RequestMapping("/user")
@@ -37,7 +35,7 @@ public class User {
                 ResponseEntity.badRequest().build();
     }
 
-  @PostMapping("/transactions")
+  @GetMapping("/transactions")
   public String transactions() throws JsonProcessingException {
     LoyaltyCode loyaltyCode = new LoyaltyCode(
         "ae546c90-c381-4e73-b38d-0565f1200b94",
