@@ -6,14 +6,14 @@ public class BoughtVoucherDTO {
 
   private Long id;
 
-  private Integer voucherId;
+  private Integer voucherTypeId;
 
-  private String voucherName;
+  private String voucherTypeName;
 
   public BoughtVoucherDTO(BoughtVoucher boughtVoucher) {
     this.id = boughtVoucher.getId();
-    this.voucherId = boughtVoucher.getVoucherId();
-    this.voucherName = boughtVoucher.getName();
+    this.voucherTypeId = boughtVoucher.getVoucherId();
+    this.voucherTypeName = boughtVoucher.getName();
   }
 
   public Long getId() {
@@ -24,19 +24,19 @@ public class BoughtVoucherDTO {
     this.id = id;
   }
 
-  public Integer getVoucherId() {
-    return voucherId;
+  public Integer getVoucherTypeId() {
+    return voucherTypeId;
   }
 
-  public void setVoucherId(Integer voucherId) {
-    this.voucherId = voucherId;
+  public void setVoucherTypeId(Integer voucherTypeId) {
+    this.voucherTypeId = voucherTypeId;
   }
 
-  public String getVoucherName() {
-    return voucherName;
+  public String getVoucherTypeName() {
+    return voucherTypeName;
   }
 
-  public void setVoucherName(String voucherName) {
-    this.voucherName = voucherName;
+  public void setVoucherTypeName(String voucherTypeName) {
+    this.voucherTypeName = voucherTypeName;
   }
 }

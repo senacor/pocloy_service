@@ -1,8 +1,10 @@
 package com.senacor.bankathon2018.service;
 
 import com.google.common.collect.ImmutableMap;
+import com.senacor.bankathon2018.service.model.BoughtVoucher;
 import com.senacor.bankathon2018.service.model.LoyaltyContent;
 import com.senacor.bankathon2018.service.model.Voucher;
+import com.senacor.bankathon2018.service.repository.BoughtVoucherRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -13,14 +15,31 @@ import org.springframework.stereotype.Service;
 public class DemoDataService {
 
   private List<Voucher> vouchers;
+  private final BoughtVoucherRepository boughtVoucherRepository;
 
 
-  public DemoDataService() {
+  public DemoDataService(
+      BoughtVoucherRepository boughtVoucherRepository) {
+    this.boughtVoucherRepository = boughtVoucherRepository;
     vouchers = new ArrayList<>();
   }
 
   @EventListener
   public void appReady(ApplicationReadyEvent event) {
+    insertAvailableVouchers();
+    insertAlreadyBoughtVouchers();
+  }
+
+  private void insertAlreadyBoughtVouchers() {
+    boughtVoucherRepository.save(new BoughtVoucher(1, "Burger", "blalasaadri@googlemail.com"));
+    boughtVoucherRepository
+        .save(new BoughtVoucher(4, "10L of Petrol", "blalasaadri@googlemail.com"));
+    boughtVoucherRepository
+        .save(new BoughtVoucher(2, "Crockery set", "blalasaadri@googlemail.com"));
+    boughtVoucherRepository.save(new BoughtVoucher(3, "Sunglasses", "blalasaadri@googlemail.com"));
+  }
+
+  private void insertAvailableVouchers() {
     //define existing vouchers
     vouchers.add(new Voucher(1, "Burger",
         ImmutableMap.of(LoyaltyContent.bottle_wine, 2, LoyaltyContent.food_apple, 3)));
