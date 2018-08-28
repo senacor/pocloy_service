@@ -64,6 +64,7 @@ public class User {
     }
 
     private String buildErrMsg(Throwable throwable) {
+      throwable.printStackTrace();
         if(throwable instanceof FigoException) {
             FigoException figoError = (FigoException) throwable;
             return figoError.getErrorDescription();

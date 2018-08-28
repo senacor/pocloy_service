@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Voucher {
 
-  private Long id;
+  private Integer id;
 
   private String name;
 
@@ -13,17 +13,17 @@ public class Voucher {
   public Voucher() {
   }
 
-  public Voucher(Long id, String name, Map<LoyaltyContent, Integer> price) {
+  public Voucher(Integer id, String name, Map<LoyaltyContent, Integer> price) {
     this.id = id;
     this.name = name;
     this.price = price;
   }
 
-  public Long getId() {
+  public Integer getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 
