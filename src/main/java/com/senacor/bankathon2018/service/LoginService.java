@@ -15,22 +15,24 @@ public class LoginService {
 
   private final static Logger LOG = LoggerFactory.getLogger(LoginService.class);
   private final FigoConnector figoConnector;
+  private final AxwayService axwayService;
 
-  public LoginService(FigoConnector figoConnector) {
+  public LoginService(FigoConnector figoConnector, AxwayService axwayService) {
     this.figoConnector = figoConnector;
+    this.axwayService = axwayService;
   }
 
   public boolean isLoginViable(Credentials credentials) {
     //TODO More Error Handling?
-    Try<TokenResponse> tokenResponses = figoConnector.figoLogin(credentials);
-    if (tokenResponses.isSuccess()) {
-      LOG.info("Login was successful");
-      return true;
-    } else {
-      LOG.info("Login was unsuccessful");
-      printErrMsg(tokenResponses.getCause());
-      return false;
-    }
+    Try<TokenResponse> figoLoginResponse = figoConnector.figoLogin(credentials);
+    Try<String> axwayLoginResponse = axwayService.loginAndObtainSession(credentials);
+
+    figoLoginResponse.onSuccess(token -> LOG.info("Login into Figo was successful"));
+    figoLoginResponse.onFailure(token -> LOG.info("Login into Axway was unsuccessful"));
+    axwayLoginResponse.onSuccess(session -> LOG.info("Login into Axway was successful"));
+    axwayLoginResponse.onFailure(session -> LOG.info("Login into Axway was unsuccessful"));
+
+    return figoLoginResponse.isSuccess() && axwayLoginResponse.isSuccess();
   }
 
   private void printErrMsg(Throwable throwable) {

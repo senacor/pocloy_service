@@ -38,7 +38,6 @@ public class User {
         this.transactionService = transactionService;
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody Credentials credentials) {
         return loginService.isLoginViable(credentials) ?
