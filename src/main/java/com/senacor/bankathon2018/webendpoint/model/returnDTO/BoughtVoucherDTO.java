@@ -6,7 +6,7 @@ public class BoughtVoucherDTO {
 
   private Long id;
 
-  private Long voucherId;
+  private Integer voucherId;
 
   private String voucherName;
 
@@ -24,11 +24,11 @@ public class BoughtVoucherDTO {
     this.id = id;
   }
 
-  public Long getVoucherId() {
+  public Integer getVoucherId() {
     return voucherId;
   }
 
-  public void setVoucherId(Long voucherId) {
+  public void setVoucherId(Integer voucherId) {
     this.voucherId = voucherId;
   }
 

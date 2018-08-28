@@ -11,14 +11,13 @@ public class BoughtVoucher {
   @GeneratedValue
   private Long id;
 
-  private Long voucherId;
+  private Integer voucherId;
 
   private String name;
 
   private String user;
 
-  public BoughtVoucher(Long id, Long voucherId, String name, String user) {
-    this.id = id;
+  public BoughtVoucher(Integer voucherId, String name, String user) {
     this.voucherId = voucherId;
     this.name = name;
     this.user = user;
@@ -35,11 +34,11 @@ public class BoughtVoucher {
     this.id = id;
   }
 
-  public Long getVoucherId() {
+  public Integer getVoucherId() {
     return voucherId;
   }
 
-  public void setVoucherId(Long voucherId) {
+  public void setVoucherId(Integer voucherId) {
     this.voucherId = voucherId;
   }
 

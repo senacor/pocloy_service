@@ -26,7 +26,8 @@ public class LoginService {
       LOG.info("Login was successful");
       return true;
     } else {
-      LOG.debug("Login was unsuccessful: ", tokenResponses.getCause());
+      LOG.info("Login was unsuccessful: ", tokenResponses.getCause());
+      tokenResponses.getCause().printStackTrace();
       return false;
     }
   }

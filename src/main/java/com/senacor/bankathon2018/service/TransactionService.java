@@ -134,6 +134,39 @@ public class TransactionService {
       throw new IllegalArgumentException("Wrong Credentials");
     }
     Voucher voucherToBuy = demoDataService.getVoucherById(voucherWithCredentials.getVoucherId());
+    List<LoyaltyCode> codesOfUser = loyaltyCodeRepository
+        .findByUser(voucherWithCredentials.getCredentials().getUsername());
+    List<String> stickerIdsToDelete = new ArrayList<>();
+
+    //Determine, if user has enough stickers
+    //CAVEAT: this was written at 9 pm
+    for (LoyaltyContent stickerType : voucherToBuy.getPrice().keySet()) {
+      int stickerAmount = voucherToBuy.getPrice().get(stickerType);
+      for (int i = 0; i < stickerAmount; i++) {
+        boolean stickerFound = false;
+        for (LoyaltyCode sticker : codesOfUser) {
+          //Sticker has the correct type and was not already selected
+          if (sticker.getContent().equals(stickerType) && !stickerIdsToDelete
+              .contains(sticker.getPaymentTransactionId())) {
+            stickerIdsToDelete.add(sticker.getPaymentTransactionId());
+            stickerFound = true;
+            break;
+          }
+          if (!stickerFound) {
+            throw new IllegalArgumentException("User has not enough stickers");
+          }
+        }
+      }
+    }
+
+    //TODO This should really be done inside a db transaction
+    BoughtVoucher newBoughtVoucherOfUser = new BoughtVoucher(voucherToBuy.getId(),
+        voucherToBuy.getName(), voucherWithCredentials.getCredentials().getUsername());
+    boughtVoucherRepository.save(newBoughtVoucherOfUser);
+
+    for (String stickerIdToDelete : stickerIdsToDelete) {
+      loyaltyCodeRepository.deleteById(stickerIdToDelete);
+    }
   }
 
 }
