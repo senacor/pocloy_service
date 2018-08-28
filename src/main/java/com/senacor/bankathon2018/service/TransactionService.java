@@ -10,10 +10,9 @@ import com.senacor.bankathon2018.webendpoint.model.Credentials;
 import com.senacor.bankathon2018.webendpoint.model.LoyaltyCodeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.dto.LoyaltyCodeDTO;
 import io.vavr.control.Try;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Random;
+
+import java.util.*;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -77,24 +76,29 @@ public class TransactionService {
   public LoyaltyCodeDTO unpackAndReturnLoyaltyCode(
       LoyaltyCodeWithCredentials loyaltyCodeWithCredentials) {
     if (!loginService.isLoginViable(loyaltyCodeWithCredentials.getCredentials())) {
-      return null;
+      throw new IllegalArgumentException("Wrong Credentials");
     }
-    LoyaltyCode loyaltyCodeToUnpack = loyaltyCodeRepository
-        .findById(loyaltyCodeWithCredentials.getCodeId()).get();
+    return loyaltyCodeRepository
+            .findById(loyaltyCodeWithCredentials.getCodeId())
+            .map(this::createContentForLoyaltyCodeDTO)
+            .map(LoyaltyCodeDTO::new)
+            .orElseThrow(() -> new IllegalArgumentException("The codeId could not be found or is already unpacked!"));
+  }
+
+  private LoyaltyCode createContentForLoyaltyCodeDTO(LoyaltyCode loyaltyCodeToUnpack) {
 
     if (loyaltyCodeToUnpack.getStatus().equals(LoyaltyStatus.unpacked)) {
-      return new LoyaltyCodeDTO(loyaltyCodeToUnpack);
+      return null;
     }
 
     //TODO: Maybe make select content after pattern
     int pick = 1 +  new Random(Calendar.getInstance().getTimeInMillis())
-        .nextInt(LoyaltyContent.values().length - 1);
+            .nextInt(LoyaltyContent.values().length - 1);
     LoyaltyContent surpriseContent = LoyaltyContent.values()[pick];
 
     loyaltyCodeToUnpack.setContent(surpriseContent);
     loyaltyCodeToUnpack.setStatus(LoyaltyStatus.unpacked);
-    loyaltyCodeRepository.save(loyaltyCodeToUnpack);
-    return new LoyaltyCodeDTO(loyaltyCodeToUnpack);
+    return loyaltyCodeRepository.save(loyaltyCodeToUnpack);
   }
 
 }
