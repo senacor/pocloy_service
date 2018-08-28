@@ -19,10 +19,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransactionService {
 
+  private static final String loyaltyCodeSuffixPattern = "[lL]oyalty[cC]ode. ";
   private final LoginService loginService;
   private final LoyaltyCodeRepository loyaltyCodeRepository;
   private final FigoConnector figoConnector;
-  public static final String loyaltyCodeSuffixPattern = "LoyaltyCode. ";
 
 
   public TransactionService(LoginService loginService,
