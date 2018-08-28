@@ -14,12 +14,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TransactionService {
 
-  private static final String loyaltyCodeSuffixPattern = "[lL]oyalty[cC]ode. ";
+  //Ae546C90-
+  private static final String loyaltyCodeSuffixPattern = ".+[lL]oyalty[cC]ode. ([a-zA-Z0-9\\-]+).+";
   private final LoginService loginService;
   private final LoyaltyCodeRepository loyaltyCodeRepository;
   private final FigoConnector figoConnector;
@@ -58,16 +61,18 @@ public class TransactionService {
         .map(transactionObject -> {
           for (Transaction transaction : transactionObject.getTransactions()) {
             //only add transactions with LoyaltyCodes
-            if (transaction.getPurpose() != null &&
-                transaction.getPurpose().contains(loyaltyCodeSuffixPattern)) {
-              //Save newly found transaction
-              String loyaltyCodeText = transaction.getPurpose()
-                  .split(loyaltyCodeSuffixPattern)[1].split(" ")[0];
-              LoyaltyCode newLoyaltyCode = new LoyaltyCode(loyaltyCodeText, LoyaltyStatus.packed,
-                  LoyaltyContent.unknown, transaction.getBooking_date(),
-                  transaction.getTransaction_id(), credentials.getUsername());
-              loyaltyCodeRepository.save(newLoyaltyCode);
-              result.add(new LoyaltyCodeDTO(newLoyaltyCode));
+            Pattern pattern = Pattern.compile(loyaltyCodeSuffixPattern);
+            if (transaction.getPurpose() != null) {
+              Matcher matcher = pattern.matcher(transaction.getPurpose());
+              if (matcher.matches()) {
+                //Save newly found transaction
+                String loyaltyCodeText = matcher.group(1);
+                LoyaltyCode newLoyaltyCode = new LoyaltyCode(loyaltyCodeText, LoyaltyStatus.packed,
+                    LoyaltyContent.unknown, transaction.getBooking_date(),
+                    transaction.getTransaction_id(), credentials.getUsername());
+                loyaltyCodeRepository.save(newLoyaltyCode);
+                result.add(new LoyaltyCodeDTO(newLoyaltyCode));
+              }
             }
           }
           return result;

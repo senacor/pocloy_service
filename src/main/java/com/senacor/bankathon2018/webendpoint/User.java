@@ -75,7 +75,8 @@ public class User {
         if (wrappedResult.isSuccess()) {
             return ResponseEntity.ok(objectMapper.writeValueAsString(wrappedResult.get()));
         } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(buildErrMsg(wrappedResult.getCause()));
         }
     }
 
