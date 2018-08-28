@@ -26,6 +26,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>10</java.version>
+
+        <me.figo.version>3.1.5</me.figo.version>
     </properties>
 
     <dependencies>
@@ -33,6 +35,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Connectors -->
+        <dependency>
+            <groupId>me.figo</groupId>
+            <artifactId>sdk</artifactId>
+            <version>${me.figo.version}</version>
         </dependency>
 		
     </dependencies>
