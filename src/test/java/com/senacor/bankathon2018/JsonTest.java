@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senacor.bankathon2018.service.model.LoyaltyContent;
 import com.senacor.bankathon2018.service.model.LoyaltyStatus;
-import com.senacor.bankathon2018.webendpoint.model.dto.LoyaltyCodeDTO;
+import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class JsonTest {
 
     LoyaltyCodeDTO loyaltyCodeDTOUnpacked = new LoyaltyCodeDTO(
         LoyaltyStatus.unpacked.toString(),
-        LoyaltyContent.sun.toString(),
+        LoyaltyContent.car_hatchback.toString(),
         LocalDateTime.now(),
         "2");
 

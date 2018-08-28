@@ -1,4 +1,4 @@
-package com.senacor.bankathon2018.webendpoint.model;
+package com.senacor.bankathon2018.webendpoint.model.requestDTO;
 
 public class LoyaltyCodeWithCredentials {
 

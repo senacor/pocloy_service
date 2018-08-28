@@ -2,34 +2,48 @@ package com.senacor.bankathon2018.service;
 
 import com.senacor.bankathon2018.connectors.FigoConnector;
 import com.senacor.bankathon2018.connectors.model.Transaction;
+import com.senacor.bankathon2018.service.model.BoughtVoucher;
 import com.senacor.bankathon2018.service.model.LoyaltyCode;
 import com.senacor.bankathon2018.service.model.LoyaltyContent;
 import com.senacor.bankathon2018.service.model.LoyaltyStatus;
+import com.senacor.bankathon2018.service.model.Voucher;
+import com.senacor.bankathon2018.service.repository.BoughtVoucherRepository;
 import com.senacor.bankathon2018.service.repository.LoyaltyCodeRepository;
-import com.senacor.bankathon2018.webendpoint.model.Credentials;
-import com.senacor.bankathon2018.webendpoint.model.LoyaltyCodeWithCredentials;
-import com.senacor.bankathon2018.webendpoint.model.dto.LoyaltyCodeDTO;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.LoyaltyCodeWithCredentials;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherWithCredentials;
+import com.senacor.bankathon2018.webendpoint.model.returnDTO.BoughtVoucherDTO;
+import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
 import io.vavr.control.Try;
-
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TransactionService {
 
+  private static final String loyaltyCodeSuffixPattern = ".+[lL]oyalty[cC]ode. ([a-zA-Z0-9\\-]+).+";
   private final LoginService loginService;
   private final LoyaltyCodeRepository loyaltyCodeRepository;
   private final FigoConnector figoConnector;
-  public static final String loyaltyCodeSuffixPattern = "LoyaltyCode. ";
+  private final BoughtVoucherRepository boughtVoucherRepository;
+  private final DemoDataService demoDataService;
 
 
   public TransactionService(LoginService loginService,
       LoyaltyCodeRepository loyaltyCodeRepository,
-      FigoConnector figoConnector) {
+      FigoConnector figoConnector,
+      BoughtVoucherRepository boughtVoucherRepository,
+      DemoDataService demoDataService) {
     this.loginService = loginService;
     this.loyaltyCodeRepository = loyaltyCodeRepository;
     this.figoConnector = figoConnector;
+    this.boughtVoucherRepository = boughtVoucherRepository;
+    this.demoDataService = demoDataService;
   }
 
   public Try<List<LoyaltyCodeDTO>> getLoyaltyCodes(Credentials credentials) {
@@ -37,15 +51,12 @@ public class TransactionService {
     LoyaltyCode codeWithMaxTxCode = null;
 
     //query known loyaltyCodes from DB
-    for (LoyaltyCode loyaltyCode : loyaltyCodeRepository.findAll()) {
-      //TODO maybe replace if with "byUsername" query method in repository
-      if (credentials.getUsername().equals(loyaltyCode.getUser())) {
+    for (LoyaltyCode loyaltyCode : loyaltyCodeRepository.findByUser(credentials.getUsername())) {
         if (codeWithMaxTxCode == null || codeWithMaxTxCode.getPaymentDate()
             .isBefore(loyaltyCode.getPaymentDate())) {
           codeWithMaxTxCode = loyaltyCode;
         }
         result.add(new LoyaltyCodeDTO(loyaltyCode));
-      }
     }
 
     String lastTxCode = codeWithMaxTxCode != null ? codeWithMaxTxCode.getPaymentTransactionId() : null;
@@ -57,16 +68,21 @@ public class TransactionService {
         .map(transactionObject -> {
           for (Transaction transaction : transactionObject.getTransactions()) {
             //only add transactions with LoyaltyCodes
-            if (transaction.getSepa_remittance_info() != null &&
-                transaction.getSepa_remittance_info().contains(loyaltyCodeSuffixPattern)) {
-              //Save newly found transaction
-              String loyaltyCodeText = transaction.getSepa_remittance_info()
-                  .split(loyaltyCodeSuffixPattern)[1].split(" ")[0];
-              LoyaltyCode newLoyaltyCode = new LoyaltyCode(loyaltyCodeText, LoyaltyStatus.packed,
-                  LoyaltyContent.unknown, transaction.getBooking_date(),
-                  transaction.getTransaction_id(), credentials.getUsername());
-              loyaltyCodeRepository.save(newLoyaltyCode);
-              result.add(new LoyaltyCodeDTO(newLoyaltyCode));
+            Pattern pattern = Pattern.compile(loyaltyCodeSuffixPattern);
+            if (transaction.getPurpose() != null) {
+              Matcher matcher = pattern.matcher(transaction.getPurpose());
+              if (matcher.matches()) {
+                //Save newly found transaction
+                String loyaltyCodeText = matcher.group(1);
+                LoyaltyCode newLoyaltyCode = new LoyaltyCode(loyaltyCodeText, LoyaltyStatus.packed,
+                    LoyaltyContent.unknown, transaction.getBooking_date(),
+                    transaction.getTransaction_id(), credentials.getUsername());
+                //Filter transactions that where sent and received by the same user
+                if (!loyaltyCodeRepository.existsById(newLoyaltyCode.getPaymentTransactionId())) {
+                  loyaltyCodeRepository.save(newLoyaltyCode);
+                  result.add(new LoyaltyCodeDTO(newLoyaltyCode));
+                }
+              }
             }
           }
           return result;
@@ -99,6 +115,58 @@ public class TransactionService {
     loyaltyCodeToUnpack.setContent(surpriseContent);
     loyaltyCodeToUnpack.setStatus(LoyaltyStatus.unpacked);
     return loyaltyCodeRepository.save(loyaltyCodeToUnpack);
+  }
+
+  public List<BoughtVoucherDTO> getUserVouchers(Credentials credentials) {
+    if (!loginService.isLoginViable(credentials)) {
+      throw new IllegalArgumentException("Wrong Credentials");
+    }
+    List<BoughtVoucherDTO> voucherDTOs = new ArrayList<>();
+    for (BoughtVoucher boughtVoucherOfUser : boughtVoucherRepository
+        .findByUser(credentials.getUsername())) {
+      voucherDTOs.add(new BoughtVoucherDTO(boughtVoucherOfUser));
+    }
+    return voucherDTOs;
+  }
+
+  public void buyVoucher(VoucherWithCredentials voucherWithCredentials) {
+    if (!loginService.isLoginViable(voucherWithCredentials.getCredentials())) {
+      throw new IllegalArgumentException("Wrong Credentials");
+    }
+    Voucher voucherToBuy = demoDataService.getVoucherById(voucherWithCredentials.getVoucherId());
+    List<LoyaltyCode> codesOfUser = loyaltyCodeRepository
+        .findByUser(voucherWithCredentials.getCredentials().getUsername());
+    List<String> stickerIdsToDelete = new ArrayList<>();
+
+    //Determine, if user has enough stickers
+    //CAVEAT: this was written at 9 pm
+    for (LoyaltyContent stickerType : voucherToBuy.getPrice().keySet()) {
+      int stickerAmount = voucherToBuy.getPrice().get(stickerType);
+      for (int i = 0; i < stickerAmount; i++) {
+        boolean stickerFound = false;
+        for (LoyaltyCode sticker : codesOfUser) {
+          //Sticker has the correct type and was not already selected
+          if (sticker.getContent().equals(stickerType) && !stickerIdsToDelete
+              .contains(sticker.getPaymentTransactionId())) {
+            stickerIdsToDelete.add(sticker.getPaymentTransactionId());
+            stickerFound = true;
+            break;
+          }
+          if (!stickerFound) {
+            throw new IllegalArgumentException("User has not enough stickers");
+          }
+        }
+      }
+    }
+
+    //TODO This should really be done inside a db transaction
+    BoughtVoucher newBoughtVoucherOfUser = new BoughtVoucher(voucherToBuy.getId(),
+        voucherToBuy.getName(), voucherWithCredentials.getCredentials().getUsername());
+    boughtVoucherRepository.save(newBoughtVoucherOfUser);
+
+    for (String stickerIdToDelete : stickerIdsToDelete) {
+      loyaltyCodeRepository.deleteById(stickerIdToDelete);
+    }
   }
 
 }
