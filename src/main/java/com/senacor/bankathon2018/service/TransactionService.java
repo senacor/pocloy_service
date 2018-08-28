@@ -11,6 +11,7 @@ import com.senacor.bankathon2018.webendpoint.model.LoyaltyCodeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.dto.LoyaltyCodeDTO;
 import io.vavr.control.Try;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 import org.springframework.stereotype.Service;
@@ -82,7 +83,8 @@ public class TransactionService {
         .findById(loyaltyCodeWithCredentials.getCodeId()).get();
 
     //TODO: Maybe make select content after pattern
-    int pick = new Random().nextInt(1 + LoyaltyContent.values().length);
+    int pick = 1 + new Random(Calendar.getInstance().getTimeInMillis())
+        .nextInt(LoyaltyContent.values().length);
     LoyaltyContent surpriseContent = LoyaltyContent.values()[pick];
 
     loyaltyCodeToUnpack.setContent(surpriseContent);
