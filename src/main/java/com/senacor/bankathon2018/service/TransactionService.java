@@ -6,13 +6,14 @@ import com.senacor.bankathon2018.service.model.LoyaltyCode;
 import com.senacor.bankathon2018.service.model.LoyaltyContent;
 import com.senacor.bankathon2018.service.model.LoyaltyStatus;
 import com.senacor.bankathon2018.service.repository.LoyaltyCodeRepository;
-import com.senacor.bankathon2018.webendpoint.model.Credentials;
-import com.senacor.bankathon2018.webendpoint.model.LoyaltyCodeWithCredentials;
-import com.senacor.bankathon2018.webendpoint.model.dto.LoyaltyCodeDTO;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.LoyaltyCodeWithCredentials;
+import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
 import io.vavr.control.Try;
-
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Random;
 import org.springframework.stereotype.Service;
 
 @Service

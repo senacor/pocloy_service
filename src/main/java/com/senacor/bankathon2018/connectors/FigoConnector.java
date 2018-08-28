@@ -1,7 +1,7 @@
 package com.senacor.bankathon2018.connectors;
 
 import com.senacor.bankathon2018.connectors.model.TransactionsEntity;
-import com.senacor.bankathon2018.webendpoint.model.Credentials;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
 import io.vavr.control.Try;
 import me.figo.FigoConnection;
 import me.figo.internal.TokenResponse;

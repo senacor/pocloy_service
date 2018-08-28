@@ -1,4 +1,4 @@
-package com.senacor.bankathon2018.webendpoint.model.dto;
+package com.senacor.bankathon2018.webendpoint.model.returnDTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
