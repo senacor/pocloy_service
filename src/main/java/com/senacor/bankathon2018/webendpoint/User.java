@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senacor.bankathon2018.service.LoginService;
 import com.senacor.bankathon2018.service.TransactionService;
 import com.senacor.bankathon2018.webendpoint.model.Credentials;
+import com.senacor.bankathon2018.webendpoint.model.LoyaltyCodeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.dto.LoyaltyCodeDTO;
 import io.vavr.control.Try;
 import java.util.List;
@@ -50,6 +51,20 @@ public class User {
     } else {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body(codes.failed().getCause().getMessage());
+    }
+  }
+
+  @PostMapping("/unpack")
+  public ResponseEntity<String> unpack(
+      @RequestBody LoyaltyCodeWithCredentials loyaltyCodeWithCredentials)
+      throws JsonProcessingException {
+    LoyaltyCodeDTO unpackedCode = transactionService
+        .unpackAndReturnLoyaltyCode(loyaltyCodeWithCredentials);
+    ObjectMapper objectMapper = new ObjectMapper();
+    if (unpackedCode != null) {
+      return ResponseEntity.ok(objectMapper.writeValueAsString(unpackedCode));
+    } else {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
 }

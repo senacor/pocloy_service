@@ -15,18 +15,23 @@ public class LoyaltyCodeDTO {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss SS")
   private Date paymentDate;
 
+  private String codeId;
+
   public LoyaltyCodeDTO(LoyaltyCode loyaltyCode) {
     this.loyaltyCode = loyaltyCode.getLoyaltyCode();
     this.status = loyaltyCode.getStatus().toString();
     this.content = loyaltyCode.getContent().toString();
     this.paymentDate = loyaltyCode.getPaymentDate();
+    this.codeId = loyaltyCode.getPaymentTransactionId();
   }
 
-  public LoyaltyCodeDTO(String loyaltyCode, String status, String content, Date paymentDate) {
+  public LoyaltyCodeDTO(String loyaltyCode, String status, String content, Date paymentDate,
+      String codeId) {
     this.loyaltyCode = loyaltyCode;
     this.status = status;
     this.content = content;
     this.paymentDate = paymentDate;
+    this.codeId = codeId;
   }
 
   public String getLoyaltyCode() {

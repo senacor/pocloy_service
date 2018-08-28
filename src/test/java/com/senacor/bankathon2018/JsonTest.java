@@ -18,7 +18,8 @@ public class JsonTest {
         "ae546c90-c381-4e73-b38d-0565f1200b94",
         LoyaltyStatus.packed.toString(),
         LoyaltyContent.unknown.toString(),
-        Calendar.getInstance().getTime());
+        Calendar.getInstance().getTime(),
+        "3");
 
     ObjectMapper objectMapper = new ObjectMapper();
     System.out.println(objectMapper.writeValueAsString(loyaltyCodeDTO));
@@ -30,13 +31,15 @@ public class JsonTest {
         "ae546c90-c381-4e73-b38d-0565f1200b94",
         LoyaltyStatus.packed.toString(),
         LoyaltyContent.unknown.toString(),
-        Calendar.getInstance().getTime());
+        Calendar.getInstance().getTime(),
+        "1");
 
     LoyaltyCodeDTO loyaltyCodeDTOUnpacked = new LoyaltyCodeDTO(
         "96e86953-c71a-40f0-af60-5bd83d7a77c0",
         LoyaltyStatus.unpacked.toString(),
         LoyaltyContent.sun.toString(),
-        Calendar.getInstance().getTime());
+        Calendar.getInstance().getTime(),
+        "2");
 
     List<LoyaltyCodeDTO> codes = new ArrayList<>();
     codes.add(loyaltyCodeDTO);
