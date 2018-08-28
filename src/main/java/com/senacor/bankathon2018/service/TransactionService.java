@@ -9,9 +9,7 @@ import com.senacor.bankathon2018.webendpoint.model.Credentials;
 import com.senacor.bankathon2018.webendpoint.model.dto.LoyaltyCodeDTO;
 import io.vavr.control.Try;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.UUID;
 import me.figo.models.Transaction;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +19,7 @@ public class TransactionService {
   private final LoginService loginService;
   private final LoyaltyCodeRepository loyaltyCodeRepository;
   private final FigoConnector figoConnector;
+  public static final String loyaltyCodeSuffixPattern = "LoyaltyCode. ";
 
 
   public TransactionService(LoginService loginService,
@@ -44,40 +43,29 @@ public class TransactionService {
           codeWithMaxTxCode = loyaltyCode;
         }
         result.add(new LoyaltyCodeDTO(loyaltyCode));
-        System.out.println(
-            "Found code in DB " + loyaltyCode.getLoyaltyCode() + " with content " + loyaltyCode
-                .getContent());
       }
     }
 
-    //Todo query known loyaltyCodes from DB
-
-    //Todo query figo for new loyaltyCodes
+    //query figo for new loyaltyCodes
     loginService
         .obtainAccessToken(credentials)
         .map(token -> figoConnector.getTransactions(token, null, true))
         .onSuccess(transactionObject -> {
-          System.out.println(transactionObject.getTransactions().size());
           for (Transaction transaction : transactionObject.getTransactions()) {
-            System.out.println("{");
-            System.out.println("BookingText=" + transaction.getBookingText());
-            System.out.println("Amount=" + transaction.getAmount());
-            System.out.println("}");
+            //only add transactions with LoyaltyCodes
+            if (transaction.getBookingText() != null &&
+                transaction.getBookingText().contains(loyaltyCodeSuffixPattern)) {
+              //Save newly found transaction
+              String loyaltyCodeText = transaction.getBookingText()
+                  .split(loyaltyCodeSuffixPattern)[1].split(" ")[0];
+              LoyaltyCode newLoyaltyCode = new LoyaltyCode(loyaltyCodeText, LoyaltyStatus.packed,
+                  LoyaltyContent.unknown, transaction.getBookingDate(),
+                  transaction.getTransactionId(), credentials.getUsername());
+              loyaltyCodeRepository.save(newLoyaltyCode);
+              result.add(new LoyaltyCodeDTO(newLoyaltyCode));
+            }
           }
-        })
-        .onFailure(err -> {
-          System.out.println(err.getMessage());
         });
-
-    //Update DB with new transactions
-    loyaltyCodeRepository.save(new LoyaltyCode(
-        UUID.randomUUID().toString(),
-        LoyaltyStatus.unpacked,
-        LoyaltyContent.sun,
-        Calendar.getInstance().getTime(),
-        UUID.randomUUID().toString(),
-        credentials.getUsername()));
-
     return Try.of(() -> result);
   }
 
