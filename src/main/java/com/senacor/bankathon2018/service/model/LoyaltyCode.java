@@ -7,7 +7,6 @@ import javax.persistence.Id;
 @Entity
 public class LoyaltyCode {
 
-  @Id
   private String loyaltyCode;
 
   private LoyaltyStatus status;
@@ -16,6 +15,7 @@ public class LoyaltyCode {
 
   private Date paymentDate;
 
+  @Id
   private String paymentTransactionId;
 
   private String user;
