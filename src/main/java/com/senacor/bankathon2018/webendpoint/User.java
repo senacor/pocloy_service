@@ -38,7 +38,7 @@ public class User {
                 ResponseEntity.badRequest().build();
     }
 
-  @GetMapping("/transactions")
+  @PostMapping("/transactions")
   public ResponseEntity<String> transactions(@RequestBody Credentials credentials)
       throws JsonProcessingException {
     Try<List<LoyaltyCode>> codes = transactionService.getLoyaltyCodes(credentials);
@@ -46,7 +46,7 @@ public class User {
     String codesAsJson;
 
     if (codes.isSuccess()) {
-      codesAsJson = objectMapper.writeValueAsString(codes);
+      codesAsJson = objectMapper.writeValueAsString(codes.get());
       return ResponseEntity.ok(codesAsJson);
     } else {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
