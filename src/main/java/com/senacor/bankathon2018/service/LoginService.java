@@ -3,6 +3,7 @@ package com.senacor.bankathon2018.service;
 import com.senacor.bankathon2018.connectors.FigoConnector;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
 import io.vavr.control.Try;
+import me.figo.FigoException;
 import me.figo.internal.TokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +27,19 @@ public class LoginService {
       LOG.info("Login was successful");
       return true;
     } else {
-      LOG.info("Login was unsuccessful: ", tokenResponses.getCause());
-      tokenResponses.getCause().printStackTrace();
+      LOG.info("Login was unsuccessful");
+      printErrMsg(tokenResponses.getCause());
       return false;
+    }
+  }
+
+  private void printErrMsg(Throwable throwable) {
+    throwable.printStackTrace();
+    if (throwable instanceof FigoException) {
+      FigoException figoError = (FigoException) throwable;
+      LOG.info(figoError.getErrorDescription());
+    } else {
+      LOG.info(throwable.getMessage());
     }
   }
 

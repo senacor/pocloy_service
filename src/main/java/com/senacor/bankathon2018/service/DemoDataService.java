@@ -30,6 +30,10 @@ public class DemoDataService {
         ImmutableMap.of(LoyaltyContent.sunglasses, 5, LoyaltyContent.white_balance_sunny, 10)));
     vouchers.add(new Voucher(4, "10L of Petrol",
         ImmutableMap.of(LoyaltyContent.gas_station, 5, LoyaltyContent.car_hatchback, 5)));
+    vouchers.add(new Voucher(5, "Burger",
+        ImmutableMap.of(LoyaltyContent.hamburger, 1)));
+    vouchers.add(new Voucher(6, "10L of Petrol",
+        ImmutableMap.of(LoyaltyContent.pizza, 1)));
   }
 
   public List<Voucher> getVouchers() {

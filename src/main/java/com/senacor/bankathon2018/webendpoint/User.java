@@ -92,8 +92,18 @@ public class User {
 
     @PostMapping("/redeemVoucher")
     public ResponseEntity<String> redeemVoucher(
-        @RequestBody VoucherWithCredentials voucherWithCredentials) {
-        return null;
+        @RequestBody VoucherWithCredentials voucherWithCredentials) throws JsonProcessingException {
+      Try<BoughtVoucherDTO> wrappedResult = Try.of(() -> transactionService
+          .buyVoucher(voucherWithCredentials));
+      ObjectMapper objectMapper = new ObjectMapper();
+      if (wrappedResult.isSuccess()) {
+        return ResponseEntity.ok(objectMapper.writeValueAsString(wrappedResult.get()));
+      } else {
+        String errorMsg = buildErrMsg(wrappedResult.getCause());
+        LOG.error(errorMsg);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(errorMsg);
+      }
     }
 
     @PostMapping("/vouchers")

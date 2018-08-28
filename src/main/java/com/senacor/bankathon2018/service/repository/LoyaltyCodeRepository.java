@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LoyaltyCodeRepository extends JpaRepository<LoyaltyCode, String> {
 
+  List<LoyaltyCode> findByUserAndDeletedFalse(String user);
   List<LoyaltyCode> findByUser(String user);
 
 }

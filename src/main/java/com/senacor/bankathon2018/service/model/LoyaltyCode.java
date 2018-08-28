@@ -20,6 +20,8 @@ public class LoyaltyCode {
 
   private String user;
 
+  private boolean deleted;
+
   public LoyaltyCode() {
   }
 
@@ -31,6 +33,7 @@ public class LoyaltyCode {
     this.paymentDate = paymentDate;
     this.paymentTransactionId = paymentTransactionId;
     this.user = user;
+    this.deleted = false;
   }
 
   public String getUser() {
@@ -79,5 +82,13 @@ public class LoyaltyCode {
 
   public void setPaymentTransactionId(String paymentTransactionId) {
     this.paymentTransactionId = paymentTransactionId;
+  }
+
+  public boolean isDeleted() {
+    return deleted;
+  }
+
+  public void setDeleted(boolean deleted) {
+    this.deleted = deleted;
   }
 }
