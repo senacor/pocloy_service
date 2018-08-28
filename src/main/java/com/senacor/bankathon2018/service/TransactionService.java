@@ -19,10 +19,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransactionService {
 
+  private static final String loyaltyCodeSuffixPattern = "[lL]oyalty[cC]ode. ";
   private final LoginService loginService;
   private final LoyaltyCodeRepository loyaltyCodeRepository;
   private final FigoConnector figoConnector;
-  public static final String loyaltyCodeSuffixPattern = "LoyaltyCode. ";
 
 
   public TransactionService(LoginService loginService,
@@ -58,10 +58,10 @@ public class TransactionService {
         .map(transactionObject -> {
           for (Transaction transaction : transactionObject.getTransactions()) {
             //only add transactions with LoyaltyCodes
-            if (transaction.getSepa_remittance_info() != null &&
-                transaction.getSepa_remittance_info().contains(loyaltyCodeSuffixPattern)) {
+            if (transaction.getPurpose() != null &&
+                transaction.getPurpose().contains(loyaltyCodeSuffixPattern)) {
               //Save newly found transaction
-              String loyaltyCodeText = transaction.getSepa_remittance_info()
+              String loyaltyCodeText = transaction.getPurpose()
                   .split(loyaltyCodeSuffixPattern)[1].split(" ")[0];
               LoyaltyCode newLoyaltyCode = new LoyaltyCode(loyaltyCodeText, LoyaltyStatus.packed,
                   LoyaltyContent.unknown, transaction.getBooking_date(),
