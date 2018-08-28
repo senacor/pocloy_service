@@ -7,6 +7,7 @@ import com.senacor.bankathon2018.service.TransactionService;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.LoyaltyCodeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherWithCredentials;
+import com.senacor.bankathon2018.webendpoint.model.returnDTO.BoughtVoucherDTO;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
 import io.vavr.control.Try;
 import java.util.List;
@@ -84,5 +85,19 @@ public class User {
     public ResponseEntity<String> redeemVoucher(
         @RequestBody VoucherWithCredentials voucherWithCredentials) {
         return null;
+    }
+
+    @PostMapping("/vouchers")
+    public ResponseEntity<String> vouchers(
+        @RequestBody Credentials credentials) throws JsonProcessingException {
+        Try<List<BoughtVoucherDTO>> wrappedResult = Try.of(() -> transactionService
+            .getUserVouchers(credentials));
+        ObjectMapper objectMapper = new ObjectMapper();
+        if (wrappedResult.isSuccess()) {
+            return ResponseEntity.ok(objectMapper.writeValueAsString(wrappedResult.get()));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(buildErrMsg(wrappedResult.getCause()));
+        }
     }
 }
