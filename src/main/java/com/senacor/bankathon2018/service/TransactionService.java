@@ -12,7 +12,6 @@ import com.senacor.bankathon2018.service.repository.LoyaltyCodeRepository;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.LoyaltyCodeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherTypeWithCredentials;
-import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.BoughtVoucherDTO;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
 import io.vavr.control.Try;
@@ -182,16 +181,13 @@ public class TransactionService {
     return new BoughtVoucherDTO(newBoughtVoucherOfUser);
   }
 
-  public Void consumeVoucher(VoucherWithCredentials voucherWithCredentials) {
-    if (!loginService.isLoginViable(voucherWithCredentials.getCredentials())) {
-      throw new IllegalArgumentException("Wrong Credentials");
-    }
-    if (!boughtVoucherRepository.existsById(voucherWithCredentials.getVoucherId())) {
+  public Void consumeVoucher(Integer voucherId, String userName) {
+    if (!boughtVoucherRepository.existsById(voucherId)) {
       throw new IllegalArgumentException("Voucher does not exist.");
     }
     BoughtVoucher voucherToConsume = boughtVoucherRepository
-        .getOne(voucherWithCredentials.getVoucherId());
-    if (!voucherToConsume.getUser().equals(voucherWithCredentials.getCredentials().getUsername())) {
+        .getOne(voucherId);
+    if (!voucherToConsume.getUser().equals(userName)) {
       throw new IllegalArgumentException("Voucher does not belong to user.");
     }
     voucherToConsume.setConsumed(true);
