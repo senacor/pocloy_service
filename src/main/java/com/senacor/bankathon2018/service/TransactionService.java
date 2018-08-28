@@ -43,7 +43,6 @@ public class TransactionService {
           codeWithMaxTxCode = loyaltyCode;
         }
         result.add(new LoyaltyCodeDTO(loyaltyCode));
-        System.out.println("Found record in db");
       }
     }
 
@@ -66,7 +65,6 @@ public class TransactionService {
                   transaction.getTransaction_id(), credentials.getUsername());
               loyaltyCodeRepository.save(newLoyaltyCode);
               result.add(new LoyaltyCodeDTO(newLoyaltyCode));
-                System.out.println("found record in api");
             }
           }
           return result;
