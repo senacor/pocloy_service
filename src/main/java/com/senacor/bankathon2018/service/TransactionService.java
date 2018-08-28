@@ -82,6 +82,10 @@ public class TransactionService {
     LoyaltyCode loyaltyCodeToUnpack = loyaltyCodeRepository
         .findById(loyaltyCodeWithCredentials.getCodeId()).get();
 
+    if (loyaltyCodeToUnpack.getStatus().equals(LoyaltyStatus.unpacked)) {
+      return new LoyaltyCodeDTO(loyaltyCodeToUnpack);
+    }
+
     //TODO: Maybe make select content after pattern
     int pick = 1 +  new Random(Calendar.getInstance().getTimeInMillis())
         .nextInt(LoyaltyContent.values().length - 1);
