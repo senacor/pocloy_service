@@ -8,7 +8,10 @@ import me.figo.internal.TokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
@@ -36,7 +39,8 @@ public class FigoConnector {
         return Try.of(() -> figoConnection.credentialLogin(credentials.getUsername(), credentials.getPassword()));
     }
 
-    public TransactionsEntity getTransactions(String accessToken, String lastTransactionID, boolean includePending) {
+    public TransactionsEntity getTransactions(String accessToken, String lastTransactionID,
+        boolean includePending) {
         System.out.println("accessToken=" + accessToken);
         UriComponents builder = UriComponentsBuilder.fromHttpUrl(figoBaseUrl + "/rest/transactions")
                 .queryParam("since", lastTransactionID)
@@ -49,7 +53,9 @@ public class FigoConnector {
         headers.set("Authorization", "Bearer " + accessToken);
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
-        return restTemplate.exchange(builder.toUriString(), HttpMethod.GET, request, TransactionsEntity.class).getBody();
+        return restTemplate
+            .exchange(builder.toUriString(), HttpMethod.GET, request, TransactionsEntity.class)
+            .getBody();
     }
 
 }

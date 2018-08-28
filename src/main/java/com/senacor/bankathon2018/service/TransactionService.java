@@ -7,10 +7,12 @@ import com.senacor.bankathon2018.service.model.LoyaltyContent;
 import com.senacor.bankathon2018.service.model.LoyaltyStatus;
 import com.senacor.bankathon2018.service.repository.LoyaltyCodeRepository;
 import com.senacor.bankathon2018.webendpoint.model.Credentials;
+import com.senacor.bankathon2018.webendpoint.model.LoyaltyCodeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.dto.LoyaltyCodeDTO;
 import io.vavr.control.Try;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -69,6 +71,24 @@ public class TransactionService {
           }
           return result;
         });
+  }
+
+  public LoyaltyCodeDTO unpackAndReturnLoyaltyCode(
+      LoyaltyCodeWithCredentials loyaltyCodeWithCredentials) {
+    if (!loginService.isLoginViable(loyaltyCodeWithCredentials.getCredentials())) {
+      return null;
+    }
+    LoyaltyCode loyaltyCodeToUnpack = loyaltyCodeRepository
+        .findById(loyaltyCodeWithCredentials.getCodeId()).get();
+
+    //TODO: Maybe make select content after pattern
+    int pick = new Random().nextInt(1 + LoyaltyContent.values().length);
+    LoyaltyContent surpriseContent = LoyaltyContent.values()[pick];
+
+    loyaltyCodeToUnpack.setContent(surpriseContent);
+    loyaltyCodeToUnpack.setStatus(LoyaltyStatus.unpacked);
+    loyaltyCodeRepository.save(loyaltyCodeToUnpack);
+    return new LoyaltyCodeDTO(loyaltyCodeToUnpack);
   }
 
 }
