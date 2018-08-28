@@ -1,6 +1,5 @@
 package com.senacor.bankathon2018;
 
-import com.senacor.bankathon2018.connectors.FigoConnector;
 import me.figo.FigoConnection;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
