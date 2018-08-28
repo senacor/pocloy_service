@@ -15,7 +15,6 @@ public class JsonTest {
   @Test
   public void testLoyaltyCodeToJson() throws JsonProcessingException {
     LoyaltyCodeDTO loyaltyCodeDTO = new LoyaltyCodeDTO(
-        "ae546c90-c381-4e73-b38d-0565f1200b94",
         LoyaltyStatus.packed.toString(),
         LoyaltyContent.unknown.toString(),
         LocalDateTime.now(),
@@ -28,14 +27,12 @@ public class JsonTest {
   @Test
   public void testLoyaltyCodeListToJson() throws JsonProcessingException {
     LoyaltyCodeDTO loyaltyCodeDTO = new LoyaltyCodeDTO(
-        "ae546c90-c381-4e73-b38d-0565f1200b94",
         LoyaltyStatus.packed.toString(),
         LoyaltyContent.unknown.toString(),
         LocalDateTime.now(),
         "1");
 
     LoyaltyCodeDTO loyaltyCodeDTOUnpacked = new LoyaltyCodeDTO(
-        "96e86953-c71a-40f0-af60-5bd83d7a77c0",
         LoyaltyStatus.unpacked.toString(),
         LoyaltyContent.sun.toString(),
         LocalDateTime.now(),

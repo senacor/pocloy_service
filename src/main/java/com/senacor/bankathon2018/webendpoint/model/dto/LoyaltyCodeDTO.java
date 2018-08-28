@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
 
 public class LoyaltyCodeDTO {
 
-  private String loyaltyCode;
-
   private String status;
 
   private String content;
@@ -21,29 +19,19 @@ public class LoyaltyCodeDTO {
   private String codeId;
 
   public LoyaltyCodeDTO(LoyaltyCode loyaltyCode) {
-    this.loyaltyCode = loyaltyCode.getLoyaltyCode();
     this.status = loyaltyCode.getStatus().toString();
     this.content = loyaltyCode.getContent().toString();
     this.paymentDate = loyaltyCode.getPaymentDate();
     this.codeId = loyaltyCode.getPaymentTransactionId();
   }
 
-  public LoyaltyCodeDTO(String loyaltyCode, String status, String content,
+  public LoyaltyCodeDTO(String status, String content,
       LocalDateTime paymentDate,
       String codeId) {
-    this.loyaltyCode = loyaltyCode;
     this.status = status;
     this.content = content;
     this.paymentDate = paymentDate;
     this.codeId = codeId;
-  }
-
-  public String getLoyaltyCode() {
-    return loyaltyCode;
-  }
-
-  public void setLoyaltyCode(String loyaltyCode) {
-    this.loyaltyCode = loyaltyCode;
   }
 
   public String getCodeId() {
