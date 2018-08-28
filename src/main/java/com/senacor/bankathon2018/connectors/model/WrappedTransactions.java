@@ -1,4 +1,4 @@
-package com.senacor.bankathon2018.connectors;
+package com.senacor.bankathon2018.connectors.model;
 
 import java.util.List;
 import me.figo.models.Transaction;
