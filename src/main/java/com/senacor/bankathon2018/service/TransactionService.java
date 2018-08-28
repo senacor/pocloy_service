@@ -43,30 +43,34 @@ public class TransactionService {
           codeWithMaxTxCode = loyaltyCode;
         }
         result.add(new LoyaltyCodeDTO(loyaltyCode));
+        System.out.println("Found record in db");
       }
     }
 
+    String lastTxCode = codeWithMaxTxCode != null ? codeWithMaxTxCode.getPaymentTransactionId() : null;
+
     //query figo for new loyaltyCodes
-    loginService
+    return loginService
         .obtainAccessToken(credentials)
-        .map(token -> figoConnector.getTransactions(token, null, true))
-        .onSuccess(transactionObject -> {
+        .map(token -> figoConnector.getTransactions(token, lastTxCode, true))
+        .map(transactionObject -> {
           for (Transaction transaction : transactionObject.getTransactions()) {
             //only add transactions with LoyaltyCodes
-            if (transaction.getBookingText() != null &&
-                transaction.getBookingText().contains(loyaltyCodeSuffixPattern)) {
+            if (transaction.getSepa_remittance_info() != null &&
+                transaction.getSepa_remittance_info().contains(loyaltyCodeSuffixPattern)) {
               //Save newly found transaction
-              String loyaltyCodeText = transaction.getBookingText()
+              String loyaltyCodeText = transaction.getSepa_remittance_info()
                   .split(loyaltyCodeSuffixPattern)[1].split(" ")[0];
               LoyaltyCode newLoyaltyCode = new LoyaltyCode(loyaltyCodeText, LoyaltyStatus.packed,
                   LoyaltyContent.unknown, transaction.getBookingDate(),
                   transaction.getTransactionId(), credentials.getUsername());
               loyaltyCodeRepository.save(newLoyaltyCode);
               result.add(new LoyaltyCodeDTO(newLoyaltyCode));
+                System.out.println("found record in api");
             }
           }
+          return result;
         });
-    return Try.of(() -> result);
   }
 
 }

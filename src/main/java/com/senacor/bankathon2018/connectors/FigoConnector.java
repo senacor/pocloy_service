@@ -1,5 +1,6 @@
 package com.senacor.bankathon2018.connectors;
 
+import com.senacor.bankathon2018.connectors.model.WrappedTransactions;
 import com.senacor.bankathon2018.webendpoint.model.Credentials;
 import io.vavr.control.Try;
 import me.figo.FigoConnection;
