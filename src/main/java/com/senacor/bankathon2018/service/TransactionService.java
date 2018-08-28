@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransactionService {
 
-  //Ae546C90-
   private static final String loyaltyCodeSuffixPattern = ".+[lL]oyalty[cC]ode. ([a-zA-Z0-9\\-]+).+";
   private final LoginService loginService;
   private final LoyaltyCodeRepository loyaltyCodeRepository;
@@ -70,8 +69,11 @@ public class TransactionService {
                 LoyaltyCode newLoyaltyCode = new LoyaltyCode(loyaltyCodeText, LoyaltyStatus.packed,
                     LoyaltyContent.unknown, transaction.getBooking_date(),
                     transaction.getTransaction_id(), credentials.getUsername());
-                loyaltyCodeRepository.save(newLoyaltyCode);
-                result.add(new LoyaltyCodeDTO(newLoyaltyCode));
+                //Filter transactions that where sent and received by the same user
+                if (!loyaltyCodeRepository.existsById(newLoyaltyCode.getPaymentTransactionId())) {
+                  loyaltyCodeRepository.save(newLoyaltyCode);
+                  result.add(new LoyaltyCodeDTO(newLoyaltyCode));
+                }
               }
             }
           }

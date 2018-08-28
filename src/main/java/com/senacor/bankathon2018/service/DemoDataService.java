@@ -21,6 +21,7 @@ public class DemoDataService {
 
   @EventListener
   public void appReady(ApplicationReadyEvent event) {
+    //define existing vouchers
     vouchers.add(new Voucher(1L, "Burger",
         ImmutableMap.of(LoyaltyContent.bottle_wine, 2, LoyaltyContent.food_apple, 3)));
     vouchers.add(new Voucher(2L, "Crockery set",
