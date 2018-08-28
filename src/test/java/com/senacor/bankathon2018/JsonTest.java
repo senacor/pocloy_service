@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senacor.bankathon2018.service.model.LoyaltyContent;
 import com.senacor.bankathon2018.service.model.LoyaltyStatus;
 import com.senacor.bankathon2018.webendpoint.model.dto.LoyaltyCodeDTO;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -18,7 +20,7 @@ public class JsonTest {
         "ae546c90-c381-4e73-b38d-0565f1200b94",
         LoyaltyStatus.packed.toString(),
         LoyaltyContent.unknown.toString(),
-        Calendar.getInstance().getTime());
+            LocalDateTime.now());
 
     ObjectMapper objectMapper = new ObjectMapper();
     System.out.println(objectMapper.writeValueAsString(loyaltyCodeDTO));
@@ -30,13 +32,13 @@ public class JsonTest {
         "ae546c90-c381-4e73-b38d-0565f1200b94",
         LoyaltyStatus.packed.toString(),
         LoyaltyContent.unknown.toString(),
-        Calendar.getInstance().getTime());
+        LocalDateTime.now());
 
     LoyaltyCodeDTO loyaltyCodeDTOUnpacked = new LoyaltyCodeDTO(
         "96e86953-c71a-40f0-af60-5bd83d7a77c0",
         LoyaltyStatus.unpacked.toString(),
         LoyaltyContent.sun.toString(),
-        Calendar.getInstance().getTime());
+        LocalDateTime.now());
 
     List<LoyaltyCodeDTO> codes = new ArrayList<>();
     codes.add(loyaltyCodeDTO);

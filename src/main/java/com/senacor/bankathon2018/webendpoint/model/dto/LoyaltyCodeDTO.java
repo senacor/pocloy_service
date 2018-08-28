@@ -1,7 +1,11 @@
 package com.senacor.bankathon2018.webendpoint.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.senacor.bankathon2018.service.model.LoyaltyCode;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class LoyaltyCodeDTO {
@@ -13,7 +17,8 @@ public class LoyaltyCodeDTO {
   private String content;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss SS")
-  private Date paymentDate;
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
+  private LocalDateTime paymentDate;
 
   public LoyaltyCodeDTO(LoyaltyCode loyaltyCode) {
     this.loyaltyCode = loyaltyCode.getLoyaltyCode();
@@ -22,7 +27,7 @@ public class LoyaltyCodeDTO {
     this.paymentDate = loyaltyCode.getPaymentDate();
   }
 
-  public LoyaltyCodeDTO(String loyaltyCode, String status, String content, Date paymentDate) {
+  public LoyaltyCodeDTO(String loyaltyCode, String status, String content, LocalDateTime paymentDate) {
     this.loyaltyCode = loyaltyCode;
     this.status = status;
     this.content = content;
@@ -53,11 +58,11 @@ public class LoyaltyCodeDTO {
     this.content = content;
   }
 
-  public Date getPaymentDate() {
+  public LocalDateTime getPaymentDate() {
     return paymentDate;
   }
 
-  public void setPaymentDate(Date paymentDate) {
+  public void setPaymentDate(LocalDateTime paymentDate) {
     this.paymentDate = paymentDate;
   }
 }
