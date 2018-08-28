@@ -46,6 +46,14 @@ public class LoyaltyCodeDTO {
     this.loyaltyCode = loyaltyCode;
   }
 
+  public String getCodeId() {
+    return codeId;
+  }
+
+  public void setCodeId(String codeId) {
+    this.codeId = codeId;
+  }
+
   public String getStatus() {
     return status;
   }
