@@ -12,6 +12,8 @@ import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
 import io.vavr.control.Try;
 import java.util.List;
 import me.figo.FigoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +28,8 @@ public class User {
     private final LoginService loginService;
 
     private final TransactionService transactionService;
+
+  private final static Logger LOG = LoggerFactory.getLogger(User.class);
 
     public User(LoginService loginService,
                 TransactionService transactionService) {
@@ -52,8 +56,10 @@ public class User {
             codesAsJson = objectMapper.writeValueAsString(codes.get());
             return ResponseEntity.ok(codesAsJson);
         } else {
+          String errorMsg = buildErrMsg(codes.getCause());
+          LOG.error(errorMsg);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(buildErrMsg(codes.getCause()));
+                .body(errorMsg);
         }
     }
 
@@ -76,8 +82,10 @@ public class User {
         if (wrappedResult.isSuccess()) {
             return ResponseEntity.ok(objectMapper.writeValueAsString(wrappedResult.get()));
         } else {
+          String errorMsg = buildErrMsg(wrappedResult.getCause());
+          LOG.error(errorMsg);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(buildErrMsg(wrappedResult.getCause()));
+                .body(errorMsg);
         }
     }
 
@@ -96,8 +104,10 @@ public class User {
         if (wrappedResult.isSuccess()) {
             return ResponseEntity.ok(objectMapper.writeValueAsString(wrappedResult.get()));
         } else {
+          String errorMsg = buildErrMsg(wrappedResult.getCause());
+          LOG.error(errorMsg);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(buildErrMsg(wrappedResult.getCause()));
+                .body(errorMsg);
         }
     }
 }
