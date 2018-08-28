@@ -1,4 +1,4 @@
-package com.senacor.bankathon2018.connectors.model.axway;
+package com.senacor.bankathon2018.connectors.model.axway.user;
 
 public class AxwayUserQueryResponse {
 
