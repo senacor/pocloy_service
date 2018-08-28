@@ -1,6 +1,6 @@
 package com.senacor.bankathon2018.connectors;
 
-import com.senacor.bankathon2018.connectors.model.WrappedTransactions;
+import com.senacor.bankathon2018.connectors.model.TransactionsEntity;
 import com.senacor.bankathon2018.webendpoint.model.Credentials;
 import io.vavr.control.Try;
 import me.figo.FigoConnection;
@@ -36,7 +36,7 @@ public class FigoConnector {
         return Try.of(() -> figoConnection.credentialLogin(credentials.getUsername(), credentials.getPassword()));
     }
 
-    public WrappedTransactions getTransactions(String accessToken, String lastTransactionID, boolean includePending) {
+    public TransactionsEntity getTransactions(String accessToken, String lastTransactionID, boolean includePending) {
         System.out.println("accessToken=" + accessToken);
         UriComponents builder = UriComponentsBuilder.fromHttpUrl(figoBaseUrl + "/rest/transactions")
                 .queryParam("since", lastTransactionID)
@@ -49,7 +49,7 @@ public class FigoConnector {
         headers.set("Authorization", "Bearer " + accessToken);
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
-        return restTemplate.exchange(builder.toUriString(), HttpMethod.GET, request, WrappedTransactions.class).getBody();
+        return restTemplate.exchange(builder.toUriString(), HttpMethod.GET, request, TransactionsEntity.class).getBody();
     }
 
 }
