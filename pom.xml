@@ -43,7 +43,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.senacor.bankathon2018.PocloyServiceApplication</mainClass>
+                    <mainClass>com.senacor.bankathon2018.PocloyService</mainClass>
                 </configuration>
             </plugin>
 
