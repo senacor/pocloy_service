@@ -34,7 +34,7 @@ public class JsonTest {
 
     LoyaltyCodeDTO loyaltyCodeDTOUnpacked = new LoyaltyCodeDTO(
         LoyaltyStatus.unpacked.toString(),
-        LoyaltyContent.sun.toString(),
+        LoyaltyContent.car_hatchback.toString(),
         LocalDateTime.now(),
         "2");
 
