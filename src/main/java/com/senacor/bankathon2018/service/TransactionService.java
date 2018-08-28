@@ -11,6 +11,7 @@ import com.senacor.bankathon2018.service.repository.BoughtVoucherRepository;
 import com.senacor.bankathon2018.service.repository.LoyaltyCodeRepository;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.LoyaltyCodeWithCredentials;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherTypeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.BoughtVoucherDTO;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
@@ -126,19 +127,20 @@ public class TransactionService {
     }
     List<BoughtVoucherDTO> voucherDTOs = new ArrayList<>();
     for (BoughtVoucher boughtVoucherOfUser : boughtVoucherRepository
-        .findByUser(credentials.getUsername())) {
+        .findByUserAndConsumedFalse(credentials.getUsername())) {
       voucherDTOs.add(new BoughtVoucherDTO(boughtVoucherOfUser));
     }
     return voucherDTOs;
   }
 
-  public BoughtVoucherDTO buyVoucher(VoucherWithCredentials voucherWithCredentials) {
-    if (!loginService.isLoginViable(voucherWithCredentials.getCredentials())) {
+  public BoughtVoucherDTO buyVoucher(VoucherTypeWithCredentials voucherTypeWithCredentials) {
+    if (!loginService.isLoginViable(voucherTypeWithCredentials.getCredentials())) {
       throw new IllegalArgumentException("Wrong Credentials");
     }
-    Voucher voucherToBuy = demoDataService.getVoucherById(voucherWithCredentials.getVoucherId());
+    Voucher voucherToBuy = demoDataService
+        .getVoucherTypeById(voucherTypeWithCredentials.getVoucherTypeId());
     List<LoyaltyCode> codesOfUser = loyaltyCodeRepository
-        .findByUserAndDeletedFalse(voucherWithCredentials.getCredentials().getUsername());
+        .findByUserAndDeletedFalse(voucherTypeWithCredentials.getCredentials().getUsername());
     List<String> stickerIdsToDelete = new ArrayList<>();
 
     //Determine, if user has enough stickers
@@ -165,7 +167,7 @@ public class TransactionService {
     //Save new voucher and set all used stickers to deleted
     //TODO This should really be done inside a db transaction
     BoughtVoucher newBoughtVoucherOfUser = new BoughtVoucher(voucherToBuy.getId(),
-        voucherToBuy.getName(), voucherWithCredentials.getCredentials().getUsername());
+        voucherToBuy.getName(), voucherTypeWithCredentials.getCredentials().getUsername());
     boughtVoucherRepository.save(newBoughtVoucherOfUser);
 
     for (String stickerIdToDelete : stickerIdsToDelete) {
@@ -178,6 +180,23 @@ public class TransactionService {
     }
 
     return new BoughtVoucherDTO(newBoughtVoucherOfUser);
+  }
+
+  public Void consumeVoucher(VoucherWithCredentials voucherWithCredentials) {
+    if (!loginService.isLoginViable(voucherWithCredentials.getCredentials())) {
+      throw new IllegalArgumentException("Wrong Credentials");
+    }
+    if (!boughtVoucherRepository.existsById(voucherWithCredentials.getVoucherId())) {
+      throw new IllegalArgumentException("Voucher does not exist.");
+    }
+    BoughtVoucher voucherToConsume = boughtVoucherRepository
+        .getOne(voucherWithCredentials.getVoucherId());
+    if (!voucherToConsume.getUser().equals(voucherWithCredentials.getCredentials().getUsername())) {
+      throw new IllegalArgumentException("Voucher does not belong to user.");
+    }
+    voucherToConsume.setConsumed(true);
+    boughtVoucherRepository.save(voucherToConsume);
+    return null;
   }
 
 }

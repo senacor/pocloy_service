@@ -6,6 +6,7 @@ import com.senacor.bankathon2018.service.LoginService;
 import com.senacor.bankathon2018.service.TransactionService;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.LoyaltyCodeWithCredentials;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherTypeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.BoughtVoucherDTO;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
@@ -92,9 +93,10 @@ public class User {
 
     @PostMapping("/redeemVoucher")
     public ResponseEntity<String> redeemVoucher(
-        @RequestBody VoucherWithCredentials voucherWithCredentials) throws JsonProcessingException {
+        @RequestBody VoucherTypeWithCredentials voucherTypeWithCredentials)
+        throws JsonProcessingException {
       Try<BoughtVoucherDTO> wrappedResult = Try.of(() -> transactionService
-          .buyVoucher(voucherWithCredentials));
+          .buyVoucher(voucherTypeWithCredentials));
       ObjectMapper objectMapper = new ObjectMapper();
       if (wrappedResult.isSuccess()) {
         return ResponseEntity.ok(objectMapper.writeValueAsString(wrappedResult.get()));
@@ -121,5 +123,21 @@ public class User {
                 .body(errorMsg);
         }
     }
+
+  @PostMapping("/consumeVoucher")
+  public ResponseEntity<String> consumeVoucher(
+      @RequestBody VoucherWithCredentials voucherWithCredentials) throws JsonProcessingException {
+    Try<Void> wrappedResult = Try.of(() -> transactionService
+        .consumeVoucher(voucherWithCredentials));
+    ObjectMapper objectMapper = new ObjectMapper();
+    if (wrappedResult.isSuccess()) {
+      return ResponseEntity.ok(objectMapper.writeValueAsString(wrappedResult.get()));
+    } else {
+      String errorMsg = buildErrMsg(wrappedResult.getCause());
+      LOG.error(errorMsg);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(errorMsg);
+    }
+  }
 
 }

@@ -9,45 +9,56 @@ public class BoughtVoucher {
 
   @Id
   @GeneratedValue
-  private Long id;
+  private Integer id;
 
-  private Integer voucherId;
+  private Integer voucherTypeId;
 
-  private String name;
+  private String voucherTypeName;
 
   private String user;
 
-  public BoughtVoucher(Integer voucherId, String name, String user) {
-    this.voucherId = voucherId;
-    this.name = name;
+  private boolean consumed;
+
+  public BoughtVoucher(Integer voucherTypeId, String voucherTypeName, String user) {
+    this.voucherTypeId = voucherTypeId;
+    this.voucherTypeName = voucherTypeName;
     this.user = user;
+    this.consumed = false;
   }
 
   public BoughtVoucher() {
   }
 
-  public Long getId() {
+  public boolean isConsumed() {
+    return consumed;
+  }
+
+  public void setConsumed(boolean consumed) {
+    this.consumed = consumed;
+  }
+
+  public Integer getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 
-  public Integer getVoucherId() {
-    return voucherId;
+  public Integer getVoucherTypeId() {
+    return voucherTypeId;
   }
 
-  public void setVoucherId(Integer voucherId) {
-    this.voucherId = voucherId;
+  public void setVoucherTypeId(Integer voucherTypeId) {
+    this.voucherTypeId = voucherTypeId;
   }
 
-  public String getName() {
-    return name;
+  public String getVoucherTypeName() {
+    return voucherTypeName;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setVoucherTypeName(String voucherTypeName) {
+    this.voucherTypeName = voucherTypeName;
   }
 
   public String getUser() {

@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BoughtVoucherRepository extends JpaRepository<BoughtVoucher, Long> {
+public interface BoughtVoucherRepository extends JpaRepository<BoughtVoucher, Integer> {
 
-  List<BoughtVoucher> findByUser(String user);
+  List<BoughtVoucher> findByUserAndConsumedFalse(String user);
 
 }
