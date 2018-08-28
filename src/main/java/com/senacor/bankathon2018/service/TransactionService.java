@@ -56,7 +56,10 @@ public class TransactionService {
             .isBefore(loyaltyCode.getPaymentDate())) {
           codeWithMaxTxCode = loyaltyCode;
         }
+      //Do not include codes that have been deleted
+      if (!loyaltyCode.isDeleted()) {
         result.add(new LoyaltyCodeDTO(loyaltyCode));
+      }
     }
 
     String lastTxCode = codeWithMaxTxCode != null ? codeWithMaxTxCode.getPaymentTransactionId() : null;
@@ -129,13 +132,13 @@ public class TransactionService {
     return voucherDTOs;
   }
 
-  public void buyVoucher(VoucherWithCredentials voucherWithCredentials) {
+  public BoughtVoucherDTO buyVoucher(VoucherWithCredentials voucherWithCredentials) {
     if (!loginService.isLoginViable(voucherWithCredentials.getCredentials())) {
       throw new IllegalArgumentException("Wrong Credentials");
     }
     Voucher voucherToBuy = demoDataService.getVoucherById(voucherWithCredentials.getVoucherId());
     List<LoyaltyCode> codesOfUser = loyaltyCodeRepository
-        .findByUser(voucherWithCredentials.getCredentials().getUsername());
+        .findByUserAndDeletedFalse(voucherWithCredentials.getCredentials().getUsername());
     List<String> stickerIdsToDelete = new ArrayList<>();
 
     //Determine, if user has enough stickers
@@ -159,14 +162,22 @@ public class TransactionService {
       }
     }
 
+    //Save new voucher and set all used stickers to deleted
     //TODO This should really be done inside a db transaction
     BoughtVoucher newBoughtVoucherOfUser = new BoughtVoucher(voucherToBuy.getId(),
         voucherToBuy.getName(), voucherWithCredentials.getCredentials().getUsername());
     boughtVoucherRepository.save(newBoughtVoucherOfUser);
 
     for (String stickerIdToDelete : stickerIdsToDelete) {
-      loyaltyCodeRepository.deleteById(stickerIdToDelete);
+      for (LoyaltyCode codeOfUser : codesOfUser) {
+        if (codeOfUser.getPaymentTransactionId().equals(stickerIdToDelete)) {
+          codeOfUser.setDeleted(true);
+          loyaltyCodeRepository.save(codeOfUser);
+        }
+      }
     }
+
+    return new BoughtVoucherDTO(newBoughtVoucherOfUser);
   }
 
 }
