@@ -27,6 +27,6 @@ public class PocloyService {
 
   @Bean
   RestTemplate buildResttemplate(RestTemplateBuilder builder) {
-    return builder.setReadTimeout(15000).build();
+    return builder.setReadTimeout(30000).build();
   }
 }
