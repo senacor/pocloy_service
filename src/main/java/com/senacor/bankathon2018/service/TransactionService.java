@@ -8,12 +8,10 @@ import com.senacor.bankathon2018.service.repository.LoyaltyCodeRepository;
 import com.senacor.bankathon2018.webendpoint.model.Credentials;
 import com.senacor.bankathon2018.webendpoint.model.dto.LoyaltyCodeDTO;
 import io.vavr.control.Try;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
-
 import me.figo.models.Transaction;
 import org.springframework.stereotype.Service;
 
@@ -54,22 +52,22 @@ public class TransactionService {
 
     //Todo query known loyaltyCodes from DB
 
-        //Todo query figo for new loyaltyCodes
-        loginService
-                .obtainAccessToken(credentials)
-                .map(token -> figoConnector.getTransactions(token, null, true))
-                .onSuccess(transactionObject -> {
-                    System.out.println(transactionObject.getTransactions().size());
-                    for (Transaction transaction : transactionObject.getTransactions()) {
-                        System.out.println("{");
-                        System.out.println("BookingText=" + transaction.getBookingText());
-                        System.out.println("Amount=" + transaction.getAmount());
-                        System.out.println("}");
-                    }
-                })
-                .onFailure(err -> {
-                    System.out.println(err.getMessage());
-                });
+    //Todo query figo for new loyaltyCodes
+    loginService
+        .obtainAccessToken(credentials)
+        .map(token -> figoConnector.getTransactions(token, null, true))
+        .onSuccess(transactionObject -> {
+          System.out.println(transactionObject.getTransactions().size());
+          for (Transaction transaction : transactionObject.getTransactions()) {
+            System.out.println("{");
+            System.out.println("BookingText=" + transaction.getBookingText());
+            System.out.println("Amount=" + transaction.getAmount());
+            System.out.println("}");
+          }
+        })
+        .onFailure(err -> {
+          System.out.println(err.getMessage());
+        });
 
     //Update DB with new transactions
     loyaltyCodeRepository.save(new LoyaltyCode(
