@@ -19,14 +19,14 @@ public class LoginService {
     private final static Logger LOG = LoggerFactory.getLogger(LoginService.class);
     private final FigoConnector figoConnector;
     private final AxwayService axwayService;
-    private final SubscribService subscribService;
+    private final SubscribeService subscribeService;
     private final FigoLoginTable figoLoginTable;
 
     public LoginService(FigoConnector figoConnector, AxwayService axwayService,
-                        SubscribService subscribService, FigoLoginTable figoLoginTable) {
+                        SubscribeService subscribeService, FigoLoginTable figoLoginTable) {
         this.figoConnector = figoConnector;
         this.axwayService = axwayService;
-        this.subscribService = subscribService;
+        this.subscribeService = subscribeService;
         this.figoLoginTable = figoLoginTable;
     }
 
@@ -52,7 +52,7 @@ public class LoginService {
     private void manageAxwaySubscriptions(Credentials credentials, String deviceToken,
                                           Try<String> axwayLoginResponse) {
         axwayLoginResponse
-                .mapTry(session -> subscribService
+                .mapTry(session -> subscribeService
                         .subscripeToAxwayNotification(credentials.getUsername(), session, deviceToken))
                 .onSuccess(successful -> {
                     if (successful) {
@@ -68,7 +68,7 @@ public class LoginService {
     private void manageFigoSubscriptions(Credentials credentials,
                                          Try<TokenResponse> figoLoginResponse) {
         Try<Boolean> userIsCreatedToSubscription = figoLoginResponse.mapTry(tokenResponse ->
-                subscribService.subscribeUserToFigoNotification(tokenResponse.getAccessToken(),
+                subscribeService.subscribeUserToFigoNotification(tokenResponse.getAccessToken(),
                         credentials.getUsername()))
                 .mapTry(wrappedResponse -> wrappedResponse
                         .getOrElseThrow(this::printNotificationErrorMessages));

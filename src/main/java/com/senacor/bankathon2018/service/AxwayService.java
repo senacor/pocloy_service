@@ -29,12 +29,10 @@ public class AxwayService {
     private String axwayTechUsrPwd;
 
     private final AxwayConnector axwayConnector;
-    private final FigoConnector figoConnector;
     private final AxwaySessionRepository sessionRepository;
 
-    public AxwayService(AxwayConnector axwayConnector, FigoConnector figoConnector, AxwaySessionRepository sessionRepository) {
+    public AxwayService(AxwayConnector axwayConnector, AxwaySessionRepository sessionRepository) {
         this.axwayConnector = axwayConnector;
-        this.figoConnector = figoConnector;
         this.sessionRepository = sessionRepository;
     }
 
@@ -42,9 +40,7 @@ public class AxwayService {
         String login = credentials.getUsername();
         String password = credentials.getPassword();
 
-        return figoConnector.figoLogin(credentials)
-                .map(token -> this.getSessionForTechnicalUser())
-                .map(Try::get)
+        return getSessionForTechnicalUser()
                 .mapTry(session -> doesUserExit(login, session))
                 .mapTry(doesExit -> {
                     if (doesExit) {

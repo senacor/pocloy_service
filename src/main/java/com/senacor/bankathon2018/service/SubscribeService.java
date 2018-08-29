@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 @Service
-public class SubscribService {
+public class SubscribeService {
 
-    private final static Logger LOG = LoggerFactory.getLogger(SubscribService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(SubscribeService.class);
     private final AxwayConnector axwayConnector;
     private final FigoConnector figoConnector;
 
-    public SubscribService(AxwayConnector axwayConnector, FigoConnector figoConnector) {
+    public SubscribeService(AxwayConnector axwayConnector, FigoConnector figoConnector) {
         this.axwayConnector = axwayConnector;
         this.figoConnector = figoConnector;
     }
