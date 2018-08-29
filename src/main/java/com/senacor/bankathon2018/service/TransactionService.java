@@ -21,10 +21,8 @@ import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherTypeWithCre
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.BoughtVoucherDTO;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
 import io.vavr.control.Try;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Random;
+
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
@@ -40,6 +38,8 @@ public class TransactionService {
   private final ExchangeOfferRepository exchangeOfferRepository;
   private final DemoDataService demoDataService;
 
+  private final Map<String, LoyaltyContent> demoContent;
+
 
   public TransactionService(LoginService loginService,
       LoyaltyCodeRepository loyaltyCodeRepository,
@@ -53,6 +53,10 @@ public class TransactionService {
     this.boughtVoucherRepository = boughtVoucherRepository;
     this.exchangeOfferRepository = exchangeOfferRepository;
     this.demoDataService = demoDataService;
+
+    demoContent = new HashMap<>();
+    demoContent.put("T4365874.735", LoyaltyContent.food);
+    demoContent.put("T4365874.734", LoyaltyContent.food);
   }
 
   public Try<List<LoyaltyCodeDTO>> getLoyaltyCodes(Credentials credentials) {
@@ -153,12 +157,17 @@ public class TransactionService {
       return null;
     }
 
-    //TODO: Maybe make select content after pattern
-    int pick = 1 +  new Random(Calendar.getInstance().getTimeInMillis())
-            .nextInt(LoyaltyContent.values().length - 1);
-    LoyaltyContent surpriseContent = LoyaltyContent.values()[pick];
+    if(demoContent.containsKey(loyaltyCodeToUnpack.getLoyaltyCode())){
+      LoyaltyContent notASupriseContent = demoContent.get(loyaltyCodeToUnpack.getLoyaltyCode());
+      loyaltyCodeToUnpack.setContent(notASupriseContent);
+    } else {
+      //TODO: Maybe make select content after pattern
+      int pick = 1 +  new Random(Calendar.getInstance().getTimeInMillis())
+              .nextInt(LoyaltyContent.values().length - 1);
+      LoyaltyContent surpriseContent = LoyaltyContent.values()[pick];
+      loyaltyCodeToUnpack.setContent(surpriseContent);
+    }
 
-    loyaltyCodeToUnpack.setContent(surpriseContent);
     loyaltyCodeToUnpack.setStatus(LoyaltyStatus.unpacked);
     return loyaltyCodeRepository.save(loyaltyCodeToUnpack);
   }
