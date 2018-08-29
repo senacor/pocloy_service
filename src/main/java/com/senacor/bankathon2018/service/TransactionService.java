@@ -60,8 +60,9 @@ public class TransactionService {
 
     //query known loyaltyCodes from DB
     for (LoyaltyCode loyaltyCode : loyaltyCodeRepository.findByUser(credentials.getUsername())) {
-        if (codeWithMaxTxCode == null || codeWithMaxTxCode.getPaymentDate()
-            .isBefore(loyaltyCode.getPaymentDate())) {
+      if (!loyaltyCode.isForeignCode() && (codeWithMaxTxCode == null || codeWithMaxTxCode
+          .getPaymentDate()
+          .isBefore(loyaltyCode.getPaymentDate()))) {
           codeWithMaxTxCode = loyaltyCode;
         }
       //Do not include codes that have been deleted
@@ -311,15 +312,22 @@ public class TransactionService {
           "The offering user has not the required amount of stickers.");
     }
 
-    //change username and update in db
+    //delete and re-insert codes with new usernames
     for (LoyaltyCode codeOfConsumer : exchangeCodesOfConsumer) {
-      codeOfConsumer.setUser(offeringUser);
+      codeOfConsumer.setDeleted(true);
+      LoyaltyCode transferedCode = new LoyaltyCode(codeOfConsumer, offeringUser);
       loyaltyCodeRepository.save(codeOfConsumer);
+      loyaltyCodeRepository.save(transferedCode);
     }
     for (LoyaltyCode codeOfProvider : exchangeCodesOfProvider) {
-      codeOfProvider.setUser(consumingUser);
+      codeOfProvider.setDeleted(true);
+      LoyaltyCode transferedCode = new LoyaltyCode(codeOfProvider, consumingUser);
       loyaltyCodeRepository.save(codeOfProvider);
+      loyaltyCodeRepository.save(transferedCode);
     }
+
+    //delete the consumed offer
+    exchangeOfferRepository.deleteById(exchangeOfferToConsume.getId());
 
     return null;
   }
