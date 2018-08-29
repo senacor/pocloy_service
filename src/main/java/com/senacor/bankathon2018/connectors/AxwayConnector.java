@@ -9,7 +9,11 @@ import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -91,25 +95,27 @@ public class AxwayConnector {
                 AxwayUserQueryResponse.class));
     }
 
-    public Try<ResponseEntity<MetaInfoWrapper>> subscripeToAxwayNotifications(String login, String userSession, String deviceToken) {
-        LOG.info("Using Cookie=" + userSession);
-        UriComponents builder = createUri("push_notification/subscribe.json");
+  public Try<ResponseEntity<MetaInfoWrapper>> subscripeToAxwayNotifications(String login,
+      String userSession, String deviceToken) {
+    LOG.info("Using Cookie=" + userSession);
+    UriComponents builder = createUri("push_notification/subscribe.json");
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Cookie", userSession);
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("Cookie", userSession);
 
-        LinkedMultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("type", "android");
-        params.add("channel", login);
-        params.add("device_token", deviceToken);
+    LinkedMultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+    params.add("type", "android");
+    params.add("channel", login);
+    params.add("device_token", deviceToken);
 
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(params, headers);
+    HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(params,
+        headers);
 
-        return Try.of(() -> restTemplate.exchange(builder.toUriString(),
-                HttpMethod.POST,
-                requestEntity,
-                MetaInfoWrapper.class));
-    }
+    return Try.of(() -> restTemplate.exchange(builder.toUriString(),
+        HttpMethod.POST,
+        requestEntity,
+        MetaInfoWrapper.class));
+  }
 
     private UriComponents createUri(String route) {
         return UriComponentsBuilder.fromHttpUrl(axwayBaseUrl + route)

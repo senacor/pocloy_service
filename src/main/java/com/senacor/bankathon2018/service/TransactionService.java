@@ -107,9 +107,10 @@ public class TransactionService {
 
   public LoyaltyCodeDTO unpackAndReturnLoyaltyCode(
       LoyaltyCodeWithCredentials loyaltyCodeWithCredentials) {
-    if (!loginService.isLoginViable(loyaltyCodeWithCredentials.getCredentials())) {
-      throw new IllegalArgumentException("Wrong Credentials");
-    }
+    //TODO replace with stable is valid-user check
+    //if (!loginService.isLoginViable(loyaltyCodeWithCredentials.getCredentials())) {
+    //  throw new IllegalArgumentException("Wrong Credentials");
+    //}
     return loyaltyCodeRepository
             .findById(loyaltyCodeWithCredentials.getCodeId())
             .map(this::createContentForLoyaltyCodeDTO)
@@ -134,9 +135,10 @@ public class TransactionService {
   }
 
   public List<BoughtVoucherDTO> getUserVouchers(Credentials credentials) {
-    if (!loginService.isLoginViable(credentials)) {
-      throw new IllegalArgumentException("Wrong Credentials");
-    }
+    //TODO replace with stable is valid-user check
+    //if (!loginService.isLoginViable(credentials)) {
+    //  throw new IllegalArgumentException("Wrong Credentials");
+    //}
     List<BoughtVoucherDTO> voucherDTOs = new ArrayList<>();
     for (BoughtVoucher boughtVoucherOfUser : boughtVoucherRepository
         .findByUserAndConsumedFalse(credentials.getUsername())) {
@@ -146,9 +148,10 @@ public class TransactionService {
   }
 
   public BoughtVoucherDTO buyVoucher(VoucherTypeWithCredentials voucherTypeWithCredentials) {
-    if (!loginService.isLoginViable(voucherTypeWithCredentials.getCredentials())) {
-      throw new IllegalArgumentException("Wrong Credentials");
-    }
+    //TODO replace with stable is valid-user check
+    //if (!loginService.isLoginViable(voucherTypeWithCredentials.getCredentials())) {
+    //  throw new IllegalArgumentException("Wrong Credentials");
+    //}
     Voucher voucherToBuy = demoDataService
         .getVoucherTypeById(voucherTypeWithCredentials.getVoucherTypeId());
     List<LoyaltyCode> codesOfUser = loyaltyCodeRepository
@@ -209,9 +212,10 @@ public class TransactionService {
   }
 
   public Void setMyExchangeOffers(ExchangeOffersWithCredentials exchangeOffersWithCredentials) {
-    if (!loginService.isLoginViable(exchangeOffersWithCredentials.getCredentials())) {
-      throw new IllegalArgumentException("Wrong Credentials");
-    }
+    //TODO replace with stable is valid-user check
+    //if (!loginService.isLoginViable(exchangeOffersWithCredentials.getCredentials())) {
+    // throw new IllegalArgumentException("Wrong Credentials");
+    //}
     //TODO This should really be done inside a db transaction
 
     //Find exchange offers of user that need to be deleted
@@ -247,9 +251,10 @@ public class TransactionService {
   }
 
   public List<ExchangeOfferDTO> getMyExchangeOffers(Credentials credentials) {
-    if (!loginService.isLoginViable(credentials)) {
-      throw new IllegalArgumentException("Wrong Credentials");
-    }
+    //TODO replace with stable is valid-user check
+    //if (!loginService.isLoginViable(credentials)) {
+    //  throw new IllegalArgumentException("Wrong Credentials");
+    //}
     List<ExchangeOfferDTO> userExchangeOffers = new ArrayList<>();
     for (ExchangeOffer userExchangeOffer : exchangeOfferRepository
         .findByOfferingUser(credentials.getUsername())) {
@@ -259,9 +264,10 @@ public class TransactionService {
   }
 
   public List<ExchangeOfferDTO> getOtherExchangeOffers(Credentials credentials) {
-    if (!loginService.isLoginViable(credentials)) {
-      throw new IllegalArgumentException("Wrong Credentials");
-    }
+    //TODO replace with stable is valid-user check
+    //if (!loginService.isLoginViable(credentials)) {
+    //  throw new IllegalArgumentException("Wrong Credentials");
+    //}
     List<ExchangeOfferDTO> userExchangeOffers = new ArrayList<>();
     for (ExchangeOffer userExchangeOffer : exchangeOfferRepository
         .findByOfferingUserNot(credentials.getUsername())) {
@@ -272,9 +278,10 @@ public class TransactionService {
 
   public Void consumeExchangeOffer(
       ExchangeOfferToConsumeWithCredentials exchangeOfferToConsumeWithCredentials) {
-    if (!loginService.isLoginViable(exchangeOfferToConsumeWithCredentials.getCredentials())) {
-      throw new IllegalArgumentException("Wrong Credentials");
-    }
+    //TODO replace with stable is valid-user check
+    //if (!loginService.isLoginViable(exchangeOfferToConsumeWithCredentials.getCredentials())) {
+    //  throw new IllegalArgumentException("Wrong Credentials");
+    //}
 
     if (!exchangeOfferRepository
         .existsById(exchangeOfferToConsumeWithCredentials.getExchangeOfferToConsumeId())) {
