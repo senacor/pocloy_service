@@ -89,7 +89,7 @@ public class AxwayService {
     }
 
 
-    private Try<String> getSessionForTechnicalUser() {
+    public Try<String> getSessionForTechnicalUser() {
         LOG.info("Obtaining a Session for technical axway usr...");
         return getSession(axwayTechUsrLogin, axwayTechUsrPwd);
     }

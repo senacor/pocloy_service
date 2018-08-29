@@ -2,6 +2,7 @@ package com.senacor.bankathon2018.service;
 
 import com.senacor.bankathon2018.connectors.FigoConnector;
 import com.senacor.bankathon2018.connectors.model.figo.Transaction;
+import com.senacor.bankathon2018.connectors.model.figo.TransactionsEntity;
 import com.senacor.bankathon2018.service.model.BoughtVoucher;
 import com.senacor.bankathon2018.service.model.ExchangeOffer;
 import com.senacor.bankathon2018.service.model.LoyaltyCode;
@@ -78,34 +79,61 @@ public class TransactionService {
     }
 
     //query figo for new loyaltyCodes
-    return loginService
-        .obtainAccessToken(credentials)
-        .map(token -> figoConnector.getTransactions(token, lastTxCode, true))
-        .map(transactionObject -> {
-          for (Transaction transaction : transactionObject.getTransactions()) {
-            //only add transactions with LoyaltyCodes
-            Pattern pattern = Pattern.compile(loyaltyCodeSuffixPattern);
-            if (transaction.getPurpose() != null) {
-              Matcher matcher = pattern.matcher(transaction.getPurpose());
-              if (matcher.matches()) {
-                //Save newly found transaction
-                String loyaltyCodeText = matcher.group(1);
-                LoyaltyCode newLoyaltyCode = new LoyaltyCode(loyaltyCodeText, LoyaltyStatus.packed,
-                    LoyaltyContent.unknown, transaction.getBooking_date(),
-                    transaction.getTransaction_id(), credentials.getUsername());
-                //Filter transactions that where sent and received by the same user
-                if (!loyaltyCodeRepository.existsById(newLoyaltyCode.getPaymentTransactionId())) {
-                  loyaltyCodeRepository.save(newLoyaltyCode);
-                  result.add(new LoyaltyCodeDTO(newLoyaltyCode));
-                }
-              }
-            }
-          }
-          return result;
-        });
+      return constructListOfLoyalityCodes(credentials, result, lastTxCode);
   }
 
-  public LoyaltyCodeDTO unpackAndReturnLoyaltyCode(
+  public Try<List<LoyaltyCodeDTO>> getAllTransactionsAfterLastKnownTransaction(Credentials credentials) {
+      List<LoyaltyCodeDTO> result = new ArrayList<>();
+      LoyaltyCode codeWithMaxTxCode = null;
+
+      //query known loyaltyCodes from DB
+      for (LoyaltyCode loyaltyCode : loyaltyCodeRepository.findByUser(credentials.getUsername())) {
+          if (codeWithMaxTxCode == null || codeWithMaxTxCode.getPaymentDate()
+                  .isBefore(loyaltyCode.getPaymentDate())) {
+              codeWithMaxTxCode = loyaltyCode;
+          }
+      }
+
+      String lastTxCode = codeWithMaxTxCode != null ? codeWithMaxTxCode.getPaymentTransactionId() : null;
+
+      //The given testuser does not have bankinformation included
+      if (credentials.getUsername().equals(DemoDataService.testUserName)) {
+          return Try.failure(new IllegalArgumentException("Test user does not have Bankinformations!"));
+      }
+
+      return constructListOfLoyalityCodes(credentials, result, lastTxCode);
+
+  }
+
+    private Try<List<LoyaltyCodeDTO>> constructListOfLoyalityCodes(Credentials credentials, List<LoyaltyCodeDTO> result, String lastTxCode) {
+        return loginService
+                .obtainAccessToken(credentials)
+                .map(token -> figoConnector.getTransactions(token, lastTxCode, true))
+                .map(transactionObject -> {
+                    for (Transaction transaction : transactionObject.getTransactions()) {
+                        //only add transactions with LoyaltyCodes
+                        Pattern pattern = Pattern.compile(loyaltyCodeSuffixPattern);
+                        if (transaction.getPurpose() != null) {
+                            Matcher matcher = pattern.matcher(transaction.getPurpose());
+                            if (matcher.matches()) {
+                                //Save newly found transaction
+                                String loyaltyCodeText = matcher.group(1);
+                                LoyaltyCode newLoyaltyCode = new LoyaltyCode(loyaltyCodeText, LoyaltyStatus.packed,
+                                        LoyaltyContent.unknown, transaction.getBooking_date(),
+                                        transaction.getTransaction_id(), credentials.getUsername());
+                                //Filter transactions that where sent and received by the same user
+                                if (!loyaltyCodeRepository.existsById(newLoyaltyCode.getPaymentTransactionId())) {
+                                    loyaltyCodeRepository.save(newLoyaltyCode);
+                                    result.add(new LoyaltyCodeDTO(newLoyaltyCode));
+                                }
+                            }
+                        }
+                    }
+                    return result;
+                });
+    }
+
+    public LoyaltyCodeDTO unpackAndReturnLoyaltyCode(
       LoyaltyCodeWithCredentials loyaltyCodeWithCredentials) {
     //TODO replace with stable is valid-user check
     //if (!loginService.isLoginViable(loyaltyCodeWithCredentials.getCredentials())) {

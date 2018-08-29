@@ -7,22 +7,27 @@ import javax.persistence.Lob;
 import java.time.LocalDateTime;
 
 @Entity
-public class AxwaySession {
+public class UserDto {
 
     @Id
     private String username;
-    @Lob
-    private String cookie;
 
-    @Column(name = "DATE_TIME", nullable = false)
-    private LocalDateTime dateTime = LocalDateTime.now();
+    private String password;
 
-    public AxwaySession() {
+    public UserDto() {
     }
 
-    public AxwaySession(String username, String cookie) {
+    public UserDto(String username, String password) {
         this.username = username;
-        this.cookie = cookie;
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getUsername() {
@@ -33,24 +38,11 @@ public class AxwaySession {
         this.username = username;
     }
 
-    public String getCookie() {
-        return cookie;
-    }
-
-    public void setCookie(String cookie) {
-        this.cookie = cookie;
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
     @Override
     public String toString() {
-        return "AxwaySession{" +
+        return "UserDto{" +
                 "username='" + username + '\'' +
-                ", cookie='" + cookie + '\'' +
-                ", dateTime=" + dateTime +
+                ", password='" + password + '\'' +
                 '}';
     }
 }
