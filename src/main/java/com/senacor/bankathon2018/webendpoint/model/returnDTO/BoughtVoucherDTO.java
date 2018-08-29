@@ -4,7 +4,7 @@ import com.senacor.bankathon2018.service.model.BoughtVoucher;
 
 public class BoughtVoucherDTO {
 
-  private Long id;
+  private Integer id;
 
   private Integer voucherTypeId;
 
@@ -12,15 +12,15 @@ public class BoughtVoucherDTO {
 
   public BoughtVoucherDTO(BoughtVoucher boughtVoucher) {
     this.id = boughtVoucher.getId();
-    this.voucherTypeId = boughtVoucher.getVoucherId();
-    this.voucherTypeName = boughtVoucher.getName();
+    this.voucherTypeId = boughtVoucher.getVoucherTypeId();
+    this.voucherTypeName = boughtVoucher.getVoucherTypeName();
   }
 
-  public Long getId() {
+  public Integer getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(Integer id) {
     this.id = id;
   }
 

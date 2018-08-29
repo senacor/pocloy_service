@@ -66,7 +66,7 @@ public class DemoDataService {
     return vouchers;
   }
 
-  public Voucher getVoucherById(Integer id) {
+  public Voucher getVoucherTypeById(Integer id) {
     for (Voucher voucher : vouchers) {
       if (voucher.getId().equals(id)) {
         return voucher;

@@ -6,7 +6,7 @@ import com.senacor.bankathon2018.service.LoginService;
 import com.senacor.bankathon2018.service.TransactionService;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.LoyaltyCodeWithCredentials;
-import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherWithCredentials;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherTypeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.BoughtVoucherDTO;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
 import io.vavr.control.Try;
@@ -16,9 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController()
@@ -91,9 +93,10 @@ public class User {
 
     @PostMapping("/redeemVoucher")
     public ResponseEntity<String> redeemVoucher(
-        @RequestBody VoucherWithCredentials voucherWithCredentials) throws JsonProcessingException {
+        @RequestBody VoucherTypeWithCredentials voucherTypeWithCredentials)
+        throws JsonProcessingException {
       Try<BoughtVoucherDTO> wrappedResult = Try.of(() -> transactionService
-          .buyVoucher(voucherWithCredentials));
+          .buyVoucher(voucherTypeWithCredentials));
       ObjectMapper objectMapper = new ObjectMapper();
       if (wrappedResult.isSuccess()) {
         return ResponseEntity.ok(objectMapper.writeValueAsString(wrappedResult.get()));
@@ -120,5 +123,21 @@ public class User {
                 .body(errorMsg);
         }
     }
+
+  @GetMapping("/consumeVoucher")
+  public ResponseEntity<String> consumeVoucher(
+      @RequestParam Integer voucherId, @RequestParam String user) throws JsonProcessingException {
+    Try<Void> wrappedResult = Try.of(() -> transactionService
+        .consumeVoucher(voucherId, user));
+    ObjectMapper objectMapper = new ObjectMapper();
+    if (wrappedResult.isSuccess()) {
+      return ResponseEntity.ok(objectMapper.writeValueAsString("Voucher consumed."));
+    } else {
+      String errorMsg = buildErrMsg(wrappedResult.getCause());
+      LOG.error(errorMsg);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(errorMsg);
+    }
+  }
 
 }
