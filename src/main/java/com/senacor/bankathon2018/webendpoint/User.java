@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senacor.bankathon2018.service.LoginService;
 import com.senacor.bankathon2018.service.TransactionService;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.ExchangeOfferDTO;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.ExchangeOfferToConsumeWithCredentials;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.ExchangeOffersWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.LoyaltyCodeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherTypeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.BoughtVoucherDTO;
@@ -132,6 +135,70 @@ public class User {
     ObjectMapper objectMapper = new ObjectMapper();
     if (wrappedResult.isSuccess()) {
       return ResponseEntity.ok(objectMapper.writeValueAsString("Voucher consumed."));
+    } else {
+      String errorMsg = buildErrMsg(wrappedResult.getCause());
+      LOG.error(errorMsg);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(errorMsg);
+    }
+  }
+
+  @PostMapping("/setMyExchangeOffers")
+  public ResponseEntity<String> setMyExcangeOffers(
+      @RequestBody ExchangeOffersWithCredentials exchangeOffersWithCredentials)
+      throws JsonProcessingException {
+    Try<Void> wrappedResult = Try.of(() -> transactionService
+        .setMyExchangeOffers(exchangeOffersWithCredentials));
+    if (wrappedResult.isSuccess()) {
+      return ResponseEntity.ok().build();
+    } else {
+      String errorMsg = buildErrMsg(wrappedResult.getCause());
+      LOG.error(errorMsg);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(errorMsg);
+    }
+  }
+
+  @PostMapping("/getMyExchangeOffers")
+  public ResponseEntity<String> getMyExcangeOffers(
+      @RequestBody Credentials credentials) throws JsonProcessingException {
+    Try<List<ExchangeOfferDTO>> wrappedResult = Try.of(() -> transactionService
+        .getMyExchangeOffers(credentials));
+    ObjectMapper objectMapper = new ObjectMapper();
+    if (wrappedResult.isSuccess()) {
+      return ResponseEntity.ok(objectMapper.writeValueAsString(wrappedResult.get()));
+    } else {
+      String errorMsg = buildErrMsg(wrappedResult.getCause());
+      LOG.error(errorMsg);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(errorMsg);
+    }
+  }
+
+  @PostMapping("/getOtherExchangeOffers")
+  public ResponseEntity<String> getOtherExcangeOffers(
+      @RequestBody Credentials credentials) throws JsonProcessingException {
+    Try<List<ExchangeOfferDTO>> wrappedResult = Try.of(() -> transactionService
+        .getOtherExchangeOffers(credentials));
+    ObjectMapper objectMapper = new ObjectMapper();
+    if (wrappedResult.isSuccess()) {
+      return ResponseEntity.ok(objectMapper.writeValueAsString(wrappedResult.get()));
+    } else {
+      String errorMsg = buildErrMsg(wrappedResult.getCause());
+      LOG.error(errorMsg);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body(errorMsg);
+    }
+  }
+
+  @PostMapping("/consumeExchangeOffer")
+  public ResponseEntity<String> consumeExchangeOffer(
+      @RequestBody ExchangeOfferToConsumeWithCredentials exchangeOfferToConsumeWithCredentials)
+      throws JsonProcessingException {
+    Try<Void> wrappedResult = Try.of(() -> transactionService
+        .consumeExchangeOffer(exchangeOfferToConsumeWithCredentials));
+    if (wrappedResult.isSuccess()) {
+      return ResponseEntity.ok().build();
     } else {
       String errorMsg = buildErrMsg(wrappedResult.getCause());
       LOG.error(errorMsg);
