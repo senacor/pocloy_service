@@ -1,7 +1,7 @@
 package com.senacor.bankathon2018.service;
 
 import com.senacor.bankathon2018.connectors.FigoConnector;
-import com.senacor.bankathon2018.connectors.model.Transaction;
+import com.senacor.bankathon2018.connectors.model.figo.Transaction;
 import com.senacor.bankathon2018.service.model.BoughtVoucher;
 import com.senacor.bankathon2018.service.model.LoyaltyCode;
 import com.senacor.bankathon2018.service.model.LoyaltyContent;

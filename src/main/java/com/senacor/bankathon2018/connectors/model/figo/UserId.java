@@ -1,4 +1,4 @@
-package com.senacor.bankathon2018.connectors.model;
+package com.senacor.bankathon2018.connectors.model.figo;
 
 public class UserId {
 
