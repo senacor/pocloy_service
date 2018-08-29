@@ -22,7 +22,20 @@ public class LoyaltyCode {
 
   private boolean deleted;
 
+  private boolean foreignCode;
+
   public LoyaltyCode() {
+  }
+
+  public LoyaltyCode(LoyaltyCode codeToClone, String newUser) {
+    this.loyaltyCode = codeToClone.getLoyaltyCode();
+    this.status = codeToClone.getStatus();
+    this.content = codeToClone.getContent();
+    this.paymentDate = codeToClone.getPaymentDate();
+    this.paymentTransactionId = codeToClone.getPaymentTransactionId();
+    this.user = newUser;
+    this.deleted = false;
+    this.foreignCode = true;
   }
 
   public LoyaltyCode(String loyaltyCode, LoyaltyStatus status,
@@ -34,6 +47,7 @@ public class LoyaltyCode {
     this.paymentTransactionId = paymentTransactionId;
     this.user = user;
     this.deleted = false;
+    this.foreignCode = false;
   }
 
   public String getUser() {
@@ -90,5 +104,13 @@ public class LoyaltyCode {
 
   public void setDeleted(boolean deleted) {
     this.deleted = deleted;
+  }
+
+  public boolean isForeignCode() {
+    return foreignCode;
+  }
+
+  public void setForeignCode(boolean foreignCode) {
+    this.foreignCode = foreignCode;
   }
 }
