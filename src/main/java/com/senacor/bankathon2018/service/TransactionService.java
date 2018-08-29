@@ -2,7 +2,6 @@ package com.senacor.bankathon2018.service;
 
 import com.senacor.bankathon2018.connectors.FigoConnector;
 import com.senacor.bankathon2018.connectors.model.figo.Transaction;
-import com.senacor.bankathon2018.connectors.model.figo.TransactionsEntity;
 import com.senacor.bankathon2018.service.model.BoughtVoucher;
 import com.senacor.bankathon2018.service.model.ExchangeOffer;
 import com.senacor.bankathon2018.service.model.LoyaltyCode;
@@ -21,8 +20,12 @@ import com.senacor.bankathon2018.webendpoint.model.requestDTO.VoucherTypeWithCre
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.BoughtVoucherDTO;
 import com.senacor.bankathon2018.webendpoint.model.returnDTO.LoyaltyCodeDTO;
 import io.vavr.control.Try;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
@@ -55,8 +58,8 @@ public class TransactionService {
     this.demoDataService = demoDataService;
 
     demoContent = new HashMap<>();
-    demoContent.put("T4365874.735", LoyaltyContent.food);
-    demoContent.put("T4365874.734", LoyaltyContent.food);
+    demoContent.put("T4365874.735", LoyaltyContent.hamburger);
+    demoContent.put("T4365874.734", LoyaltyContent.bottle_wine);
   }
 
   public Try<List<LoyaltyCodeDTO>> getLoyaltyCodes(Credentials credentials) {
@@ -157,8 +160,10 @@ public class TransactionService {
       return null;
     }
 
-    if(demoContent.containsKey(loyaltyCodeToUnpack.getLoyaltyCode())){
-      LoyaltyContent notASupriseContent = demoContent.get(loyaltyCodeToUnpack.getLoyaltyCode());
+    //The selection of gift-content is fixed for the demo
+    if (demoContent.containsKey(loyaltyCodeToUnpack.getPaymentTransactionId())) {
+      LoyaltyContent notASupriseContent = demoContent
+          .get(loyaltyCodeToUnpack.getPaymentTransactionId());
       loyaltyCodeToUnpack.setContent(notASupriseContent);
     } else {
       //TODO: Maybe make select content after pattern
@@ -350,13 +355,15 @@ public class TransactionService {
     }
 
     //delete and re-insert codes with new usernames
-    for (LoyaltyCode codeOfConsumer : exchangeCodesOfConsumer) {
+    for (int i = 0; i < exchangeOfferToConsume.getRequiredStickerAmount(); i++) {
+      LoyaltyCode codeOfConsumer = exchangeCodesOfConsumer.get(i);
       codeOfConsumer.setDeleted(true);
       LoyaltyCode transferedCode = new LoyaltyCode(codeOfConsumer, offeringUser);
       loyaltyCodeRepository.save(codeOfConsumer);
       loyaltyCodeRepository.save(transferedCode);
     }
-    for (LoyaltyCode codeOfProvider : exchangeCodesOfProvider) {
+    for (int i = 0; i < exchangeOfferToConsume.getOfferedStickerAmount(); i++) {
+      LoyaltyCode codeOfProvider = exchangeCodesOfProvider.get(i);
       codeOfProvider.setDeleted(true);
       LoyaltyCode transferedCode = new LoyaltyCode(codeOfProvider, consumingUser);
       loyaltyCodeRepository.save(codeOfProvider);
