@@ -145,8 +145,7 @@ public class User {
 
   @PostMapping("/setMyExchangeOffers")
   public ResponseEntity<String> setMyExcangeOffers(
-      @RequestBody ExchangeOffersWithCredentials exchangeOffersWithCredentials)
-      throws JsonProcessingException {
+      @RequestBody ExchangeOffersWithCredentials exchangeOffersWithCredentials) {
     Try<Void> wrappedResult = Try.of(() -> transactionService
         .setMyExchangeOffers(exchangeOffersWithCredentials));
     if (wrappedResult.isSuccess()) {
@@ -193,8 +192,7 @@ public class User {
 
   @PostMapping("/consumeExchangeOffer")
   public ResponseEntity<String> consumeExchangeOffer(
-      @RequestBody ExchangeOfferToConsumeWithCredentials exchangeOfferToConsumeWithCredentials)
-      throws JsonProcessingException {
+      @RequestBody ExchangeOfferToConsumeWithCredentials exchangeOfferToConsumeWithCredentials) {
     Try<Void> wrappedResult = Try.of(() -> transactionService
         .consumeExchangeOffer(exchangeOfferToConsumeWithCredentials));
     if (wrappedResult.isSuccess()) {
