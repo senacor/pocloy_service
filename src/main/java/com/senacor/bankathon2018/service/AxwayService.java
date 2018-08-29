@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.LocalDateTime;
 
@@ -66,7 +67,7 @@ public class AxwayService {
         ResponseEntity<AxwayUserQueryResponse> res = axwayConnector.userQuery(new AxwayUserQuery(username), session);
         long count = res.getBody().getResponse().getUsers()
                 .stream()
-                .filter(user -> username.equals(user.getUsername()))
+                .filter(user -> username.toLowerCase().equals(user.getUsername().toLowerCase()))
                 .count();
         return count > 0;
     }
@@ -81,7 +82,22 @@ public class AxwayService {
     }
 
     private boolean createUser(String login, String password, String techUsrSession) {
-        return axwayConnector.createUser(login, password, techUsrSession).isSuccess();
+        Try<ResponseEntity<AxwayUserQueryResponse>> createUserRes = axwayConnector.createUser(login, password, techUsrSession);
+        createUserRes.onFailure(
+                throwable -> {
+                    if (throwable instanceof HttpClientErrorException) {
+                        HttpClientErrorException httpClientErrorException = (HttpClientErrorException) throwable;
+                        LOG.error("Could not create new User into Axway because:\n" +
+                                httpClientErrorException.getResponseBodyAsString() + "\n" +
+                                httpClientErrorException.getLocalizedMessage(), throwable);
+                    } else {
+                        LOG.error("Could not create new User into Axway because:\n" +
+                                throwable.getLocalizedMessage(), throwable);
+                    }
+                }
+        );
+
+        return createUserRes.isSuccess();
     }
 
 
@@ -100,7 +116,20 @@ public class AxwayService {
                             return !isOlderThan3Months;
                         })
                         .map(AxwaySession::getCookie)
-                        .orElseGet(() -> getAndSaveSession(login, password).get())
+                        .orElseGet(() -> getAndSaveSession(login, password).getOrElseThrow(
+                                throwable -> {
+                                    if (throwable instanceof HttpClientErrorException) {
+                                        HttpClientErrorException httpClientErrorException = (HttpClientErrorException) throwable;
+                                        LOG.error("Could not Login into Axway because:\n" +
+                                                httpClientErrorException.getResponseBodyAsString() + "\n" +
+                                                httpClientErrorException.getLocalizedMessage(), throwable);
+                                    } else {
+                                        LOG.error("Could not Login into Axway because:\n" +
+                                                throwable.getLocalizedMessage(), throwable);
+                                    }
+                                    return new RuntimeException(throwable);
+                                }
+                        ))
         );
     }
 
