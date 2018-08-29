@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senacor.bankathon2018.service.LoginService;
 import com.senacor.bankathon2018.service.TransactionService;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.LoginBody;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.ExchangeOfferDTO;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.ExchangeOfferToConsumeWithCredentials;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.ExchangeOffersWithCredentials;
@@ -43,8 +44,8 @@ public class User {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody Credentials credentials) {
-        return loginService.isLoginViable(credentials) ?
+    public ResponseEntity<Void> login(@RequestBody LoginBody loginBody) {
+        return loginService.isLoginViable(loginBody.getCredentials(), loginBody.getDevice_token()) ?
                 ResponseEntity.ok().build() :
                 ResponseEntity.badRequest().build();
     }
