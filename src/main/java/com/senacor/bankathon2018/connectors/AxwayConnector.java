@@ -16,6 +16,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.xml.ws.Response;
+
 @Service
 public class AxwayConnector {
 
@@ -91,7 +93,7 @@ public class AxwayConnector {
                 AxwayUserQueryResponse.class));
     }
 
-    public Try<ResponseEntity<MetaInfoWrapper>> subscripeToAxwayNotifications(String login, String userSession, String deviceToken) {
+    public Try<ResponseEntity<MetaInfoWrapper>> subscribeToAxwayNotifications(String login, String userSession, String deviceToken) {
         LOG.info("Using Cookie=" + userSession);
         UriComponents builder = createUri("push_notification/subscribe.json");
 
@@ -110,6 +112,29 @@ public class AxwayConnector {
                 requestEntity,
                 MetaInfoWrapper.class));
     }
+
+    public Try<ResponseEntity<MetaInfoWrapper>> newTransactionNotification(String login, String techUsrCookie) {
+        LOG.info("Using Cookie=" + techUsrCookie);
+        UriComponents builder = createUri("/push_notification/notify.json");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cookie", techUsrCookie);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        LinkedMultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("channel", login);
+        params.add("to_ids", "everyone");
+        params.add("payload", "You have received a new sticker.");
+
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(params, headers);
+        return Try.of(() -> restTemplate.exchange(builder.toUriString(),
+                HttpMethod.POST,
+                requestEntity,
+                MetaInfoWrapper.class));
+    }
+
 
     private UriComponents createUri(String route) {
         return UriComponentsBuilder.fromHttpUrl(axwayBaseUrl + route)

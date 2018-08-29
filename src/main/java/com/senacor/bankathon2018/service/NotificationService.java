@@ -63,7 +63,7 @@ public class NotificationService {
     }
 
     public Boolean subscripeToAxwayNotification(String username, String session, String deviceToken) {
-        return axwayConnector.subscripeToAxwayNotifications(username, session, deviceToken)
+        return axwayConnector.subscribeToAxwayNotifications(username, session, deviceToken)
                 .mapTry(res -> {
                     LOG.info(res.toString());
                     return true;
