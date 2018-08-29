@@ -2,6 +2,7 @@ package com.senacor.bankathon2018.connectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.senacor.bankathon2018.connectors.model.axway.push_notifications.MetaInfoWrapper;
 import com.senacor.bankathon2018.connectors.model.axway.user.AxwayUserQuery;
 import com.senacor.bankathon2018.connectors.model.axway.user.AxwayUserQueryResponse;
 import io.vavr.control.Try;
@@ -88,6 +89,26 @@ public class AxwayConnector {
                 HttpMethod.POST,
                 requestEntity,
                 AxwayUserQueryResponse.class));
+    }
+
+    public Try<ResponseEntity<MetaInfoWrapper>> subscripeToAxwayNotifications(String login, String userSession, String deviceToken) {
+        LOG.info("Using Cookie=" + userSession);
+        UriComponents builder = createUri("push_notification/subscribe.json");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cookie", userSession);
+
+        LinkedMultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("type", "android");
+        params.add("channel", login);
+        params.add("device_token", deviceToken);
+
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(params, headers);
+
+        return Try.of(() -> restTemplate.exchange(builder.toUriString(),
+                HttpMethod.POST,
+                requestEntity,
+                MetaInfoWrapper.class));
     }
 
     private UriComponents createUri(String route) {
