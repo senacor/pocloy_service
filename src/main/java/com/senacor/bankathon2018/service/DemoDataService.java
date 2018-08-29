@@ -25,7 +25,7 @@ public class DemoDataService {
   private final BoughtVoucherRepository boughtVoucherRepository;
   private final LoyaltyCodeRepository loyaltyCodeRepository;
   private final ExchangeOfferRepository exchangeOfferRepository;
-  private static final String testUserName = "christoph@prybila.at";
+  public static final String testUserName = "christoph@prybila.at";
 
 
   public DemoDataService(
@@ -47,7 +47,7 @@ public class DemoDataService {
   }
 
   private void insertLoyaltyCodesForTestUser() {
-    for (int i = 0; i < LoyaltyContent.values().length; i++) {
+    for (int i = 1; i < LoyaltyContent.values().length; i++) {
       LoyaltyContent currentContent = LoyaltyContent.values()[i];
       loyaltyCodeRepository.save(
           new LoyaltyCode(UUID.randomUUID().toString(), LoyaltyStatus.unpacked, currentContent,

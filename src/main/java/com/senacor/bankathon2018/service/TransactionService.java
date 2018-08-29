@@ -72,6 +72,11 @@ public class TransactionService {
 
     String lastTxCode = codeWithMaxTxCode != null ? codeWithMaxTxCode.getPaymentTransactionId() : null;
 
+    //The given testuser does not have bankinformation included
+    if (credentials.getUsername().equals(DemoDataService.testUserName)) {
+      return Try.of(() -> result);
+    }
+
     //query figo for new loyaltyCodes
     return loginService
         .obtainAccessToken(credentials)
