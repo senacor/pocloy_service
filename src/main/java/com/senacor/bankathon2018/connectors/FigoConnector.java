@@ -1,6 +1,10 @@
 package com.senacor.bankathon2018.connectors;
 
-import com.senacor.bankathon2018.connectors.model.figo.*;
+import com.senacor.bankathon2018.connectors.model.figo.CreateNotificationEntity;
+import com.senacor.bankathon2018.connectors.model.figo.GetNotificationEntity;
+import com.senacor.bankathon2018.connectors.model.figo.GetNotificationWrapper;
+import com.senacor.bankathon2018.connectors.model.figo.TransactionsEntity;
+import com.senacor.bankathon2018.connectors.model.figo.UserId;
 import com.senacor.bankathon2018.webendpoint.model.requestDTO.Credentials;
 import io.vavr.control.Try;
 import me.figo.FigoConnection;
@@ -8,7 +12,11 @@ import me.figo.internal.TokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
@@ -22,8 +30,8 @@ public class FigoConnector {
 
     @Value("${figo.baseUrl}")
     private String figoBaseUrl;
-    @Value("${server.url}")
-    private String serverUrl;
+  @Value("${server.url}")
+  private String serverUrl;
 
     private final FigoConnection figoConnection;
     private final RestTemplate restTemplate;
@@ -39,7 +47,7 @@ public class FigoConnector {
     }
 
     public TransactionsEntity getTransactions(String accessToken, String lastTransactionID,
-                                              boolean includePending) {
+        boolean includePending) {
         LOG.info("accessToken=" + accessToken);
         UriComponents builder = UriComponentsBuilder.fromHttpUrl(figoBaseUrl + "/rest/transactions")
                 .queryParam("since", lastTransactionID)
@@ -50,42 +58,44 @@ public class FigoConnector {
         HttpEntity<Void> request = createGetHttpEntity(accessToken);
 
         return restTemplate
-                .exchange(builder.toUriString(), HttpMethod.GET, request, TransactionsEntity.class)
-                .getBody();
+            .exchange(builder.toUriString(), HttpMethod.GET, request, TransactionsEntity.class)
+            .getBody();
     }
 
-    public Try<ResponseEntity<UserId>> getUserId(String accessToken) {
+  public Try<ResponseEntity<UserId>> getUserId(String accessToken) {
         LOG.info("accessToken=" + accessToken);
 
-        return Try.of(() -> restTemplate.exchange(figoBaseUrl + "/rest/user",
+    return Try.of(() -> restTemplate.exchange(figoBaseUrl + "/rest/user",
                 HttpMethod.GET,
                 createGetHttpEntity(accessToken),
-                UserId.class));
-    }
+        UserId.class));
+  }
 
-    public Try<ResponseEntity<GetNotificationEntity>> createSubscription(String username, String accessToken) {
-        LOG.info("accessToken=" + accessToken);
-        CreateNotificationEntity createNotificationEntity = new CreateNotificationEntity();
-        createNotificationEntity.setNotify_uri(serverUrl + "/figo/notification");
-        createNotificationEntity.setObserve_key("/rest/transactions");
-        createNotificationEntity.setState(username);
+  public Try<ResponseEntity<GetNotificationEntity>> createSubscription(String username,
+      String accessToken) {
+    LOG.info("accessToken=" + accessToken);
+    CreateNotificationEntity createNotificationEntity = new CreateNotificationEntity();
+    createNotificationEntity.setNotify_uri(serverUrl + "/figo/notification");
+    createNotificationEntity.setObserve_key("/rest/transactions");
+    createNotificationEntity.setState(username);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + accessToken);
-        HttpEntity<CreateNotificationEntity> httpEntity = new HttpEntity<>(createNotificationEntity, headers);
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("Authorization", "Bearer " + accessToken);
+    HttpEntity<CreateNotificationEntity> httpEntity = new HttpEntity<>(createNotificationEntity,
+        headers);
 
-        return Try.of(() -> restTemplate.exchange(figoBaseUrl + "/rest/notifications",
-                HttpMethod.POST,
-                httpEntity,
-                GetNotificationEntity.class));
-    }
+    return Try.of(() -> restTemplate.exchange(figoBaseUrl + "/rest/notifications",
+        HttpMethod.POST,
+        httpEntity,
+        GetNotificationEntity.class));
+  }
 
-    public Try<ResponseEntity<GetNotificationWrapper>> getNotifications(String accessToken) {
-        return Try.of(() -> restTemplate.exchange(figoBaseUrl + "/rest/notifications",
-                HttpMethod.GET,
-                createGetHttpEntity(accessToken),
-                GetNotificationWrapper.class));
+  public Try<ResponseEntity<GetNotificationWrapper>> getNotifications(String accessToken) {
+    return Try.of(() -> restTemplate.exchange(figoBaseUrl + "/rest/notifications",
+        HttpMethod.GET,
+        createGetHttpEntity(accessToken),
+        GetNotificationWrapper.class));
     }
 
     private HttpEntity<Void> createGetHttpEntity(String accessToken) {

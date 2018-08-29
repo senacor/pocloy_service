@@ -1,5 +1,6 @@
 package com.senacor.bankathon2018.service.model;
 
+import com.senacor.bankathon2018.webendpoint.model.requestDTO.ExchangeOfferDTO;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,14 +18,26 @@ public class ExchangeOffer {
 
   private LoyaltyContent requiredStickerType;
 
-  private int requiredSticker;
+  private int requiredStickerAmount;
+
+  private String offeringUser;
+
+  public ExchangeOffer(ExchangeOfferDTO exchangeOfferDTO, String offeringUser) {
+    this.id = exchangeOfferDTO.getExchangeOfferId();
+    this.offeredStickerType = exchangeOfferDTO.getOfferedStickerType();
+    this.offeredStickerAmount = exchangeOfferDTO.getOfferedStickerAmount();
+    this.requiredStickerType = exchangeOfferDTO.getRequiredStickerType();
+    this.requiredStickerAmount = exchangeOfferDTO.getRequiredStickerAmount();
+    this.offeringUser = offeringUser;
+  }
 
   public ExchangeOffer(LoyaltyContent offeredStickerType, int offeredStickerAmount,
-      LoyaltyContent requiredStickerType, int requiredSticker) {
+      LoyaltyContent requiredStickerType, int requiredStickerAmount, String offeringUser) {
     this.offeredStickerType = offeredStickerType;
     this.offeredStickerAmount = offeredStickerAmount;
     this.requiredStickerType = requiredStickerType;
-    this.requiredSticker = requiredSticker;
+    this.requiredStickerAmount = requiredStickerAmount;
+    this.offeringUser = offeringUser;
   }
 
   public ExchangeOffer() {
@@ -64,11 +77,19 @@ public class ExchangeOffer {
     this.requiredStickerType = requiredStickerType;
   }
 
-  public int getRequiredSticker() {
-    return requiredSticker;
+  public int getRequiredStickerAmount() {
+    return requiredStickerAmount;
   }
 
-  public void setRequiredSticker(int requiredSticker) {
-    this.requiredSticker = requiredSticker;
+  public void setRequiredStickerAmount(int requiredStickerAmount) {
+    this.requiredStickerAmount = requiredStickerAmount;
+  }
+
+  public String getOfferingUser() {
+    return offeringUser;
+  }
+
+  public void setOfferingUser(String offeringUser) {
+    this.offeringUser = offeringUser;
   }
 }

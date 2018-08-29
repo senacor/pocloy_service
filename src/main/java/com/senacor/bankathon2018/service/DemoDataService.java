@@ -2,11 +2,18 @@ package com.senacor.bankathon2018.service;
 
 import com.google.common.collect.ImmutableMap;
 import com.senacor.bankathon2018.service.model.BoughtVoucher;
+import com.senacor.bankathon2018.service.model.ExchangeOffer;
+import com.senacor.bankathon2018.service.model.LoyaltyCode;
 import com.senacor.bankathon2018.service.model.LoyaltyContent;
+import com.senacor.bankathon2018.service.model.LoyaltyStatus;
 import com.senacor.bankathon2018.service.model.Voucher;
 import com.senacor.bankathon2018.service.repository.BoughtVoucherRepository;
+import com.senacor.bankathon2018.service.repository.ExchangeOfferRepository;
+import com.senacor.bankathon2018.service.repository.LoyaltyCodeRepository;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -16,11 +23,18 @@ public class DemoDataService {
 
   private List<Voucher> vouchers;
   private final BoughtVoucherRepository boughtVoucherRepository;
+  private final LoyaltyCodeRepository loyaltyCodeRepository;
+  private final ExchangeOfferRepository exchangeOfferRepository;
+  public static final String testUserName = "christoph@prybila.at";
 
 
   public DemoDataService(
-      BoughtVoucherRepository boughtVoucherRepository) {
+      BoughtVoucherRepository boughtVoucherRepository,
+      LoyaltyCodeRepository loyaltyCodeRepository,
+      ExchangeOfferRepository exchangeOfferRepository) {
     this.boughtVoucherRepository = boughtVoucherRepository;
+    this.loyaltyCodeRepository = loyaltyCodeRepository;
+    this.exchangeOfferRepository = exchangeOfferRepository;
     vouchers = new ArrayList<>();
   }
 
@@ -28,6 +42,49 @@ public class DemoDataService {
   public void appReady(ApplicationReadyEvent event) {
     insertAvailableVouchers();
     insertAlreadyBoughtVouchers();
+    insertLoyaltyCodesForTestUser();
+    insertExchangeOffersForTestUser();
+  }
+
+  private void insertLoyaltyCodesForTestUser() {
+    for (int i = 1; i < LoyaltyContent.values().length; i++) {
+      LoyaltyContent currentContent = LoyaltyContent.values()[i];
+      loyaltyCodeRepository.save(
+          new LoyaltyCode(UUID.randomUUID().toString(), LoyaltyStatus.unpacked, currentContent,
+              LocalDateTime.now(), UUID.randomUUID().toString(), testUserName));
+      loyaltyCodeRepository.save(
+          new LoyaltyCode(UUID.randomUUID().toString(), LoyaltyStatus.unpacked, currentContent,
+              LocalDateTime.now(), UUID.randomUUID().toString(), testUserName));
+    }
+  }
+
+  private void insertExchangeOffersForTestUser() {
+    exchangeOfferRepository.save(
+        new ExchangeOffer(LoyaltyContent.car_hatchback, 2, LoyaltyContent.cup, 1, testUserName));
+    exchangeOfferRepository.save(
+        new ExchangeOffer(LoyaltyContent.bottle_wine, 1, LoyaltyContent.silverware_fork_knife, 1,
+            testUserName));
+    exchangeOfferRepository.save(
+        new ExchangeOffer(LoyaltyContent.hamburger, 2, LoyaltyContent.gas_station, 1,
+            testUserName));
+    exchangeOfferRepository.save(
+        new ExchangeOffer(LoyaltyContent.white_balance_sunny, 1, LoyaltyContent.pizza, 1,
+            testUserName));
+    exchangeOfferRepository.save(
+        new ExchangeOffer(LoyaltyContent.food, 1, LoyaltyContent.sunglasses, 1, testUserName));
+    exchangeOfferRepository.save(
+        new ExchangeOffer(LoyaltyContent.food, 1, LoyaltyContent.bottle_wine, 1, testUserName));
+    exchangeOfferRepository.save(
+        new ExchangeOffer(LoyaltyContent.food, 1, LoyaltyContent.car_hatchback, 1, testUserName));
+    exchangeOfferRepository.save(
+        new ExchangeOffer(LoyaltyContent.food, 1, LoyaltyContent.food_apple, 1, testUserName));
+    exchangeOfferRepository
+        .save(new ExchangeOffer(LoyaltyContent.food, 1, LoyaltyContent.food, 1, testUserName));
+    exchangeOfferRepository
+        .save(new ExchangeOffer(LoyaltyContent.food, 1, LoyaltyContent.hamburger, 1, testUserName));
+    exchangeOfferRepository.save(
+        new ExchangeOffer(LoyaltyContent.food, 1, LoyaltyContent.white_balance_sunny, 1,
+            testUserName));
   }
 
   private void insertAlreadyBoughtVouchers() {
